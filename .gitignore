@@ -1,0 +1,10 @@
+
+.idea/
+
+task/.mvn/wrapper/
+
+task/mvnw
+
+task/mvnw.cmd
+
+task/src/main/resources/application.properties
