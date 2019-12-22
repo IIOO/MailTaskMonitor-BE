@@ -1,12 +1,15 @@
 package com.monitor.task;
 
+import com.monitor.task.dto.TaskPreviewDto;
+
 import javax.mail.Address;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 
 public class MessageMapper {
-    public static TaskDto mapMessageToTaskDto(Message message) {
-        return TaskDto.builder()
+    public static TaskPreviewDto mapMessageToTaskDto(Message message) {
+        return TaskPreviewDto.builder()
+            .id(message.getMessageNumber())
             .from(addressesToString(message))
             .subject(readSubject(message))
             .build();

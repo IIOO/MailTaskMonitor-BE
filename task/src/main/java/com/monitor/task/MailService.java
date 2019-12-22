@@ -1,24 +1,22 @@
 package com.monitor.task;
 
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.mail.*;
-import javax.mail.search.FlagTerm;
+import javax.mail.search.*;
 import java.util.*;
 
 @Service
 public class MailService {
+    private Logger log = Logger.getLogger(MailService.class);
+
     @Autowired
     StoreConnectionProperties storeConnectionProperties;
 
     Optional<List<Message>> getMails() throws Exception{
-        Properties props = new Properties();
-        props.setProperty("mail.imap.ssl.enable", "true");
-        props.setProperty("mail.imaps.ssl.trust", "imap.gmail.com");
-        Session session = Session.getDefaultInstance(props);
-        Store store = session.getStore("imaps");
-        store.connect(storeConnectionProperties.getHost(), 993, storeConnectionProperties.getUsername(), storeConnectionProperties.getPassword());
+        Store store = connect();
         Folder inbox = store.getFolder( "INBOX" );
         inbox.open( Folder.READ_ONLY );
 
@@ -35,13 +33,34 @@ public class MailService {
             }
         } );
 
-        List<Message> messageList = new ArrayList<>();
-        for ( Message message : messages ) {
-            System.out.println(
-                    "sendDate: " + message.getSentDate()
-                            + " subject:" + message.getSubject() );
-            messageList.add(message);
-        }
+        List<Message> messageList = Arrays.asList(messages);
         return Optional.of(messageList);
+    }
+
+
+    Message getMailByNumber(int messageNumber) throws Exception {
+        SearchTerm searchTerm = new MessageNumberTerm(messageNumber);
+
+        Store store = connect();
+        Folder inbox = store.getFolder( "INBOX" );
+        inbox.open( Folder.READ_ONLY );
+        Message[] messages = inbox.search(searchTerm);
+        for (Message message : messages) {
+            if (message.getMessageNumber() == messageNumber) {
+                log.debug("Email with " + messageNumber + " found");
+                return message;
+            }
+        }
+        return null;
+    }
+
+    private Store connect() throws Exception{
+        Properties props = new Properties();
+        props.setProperty("mail.imap.ssl.enable", "true");
+        props.setProperty("mail.imaps.ssl.trust", "imap.gmail.com");
+        Session session = Session.getDefaultInstance(props);
+        Store store = session.getStore("imaps");
+        store.connect(storeConnectionProperties.getHost(), 993, storeConnectionProperties.getUsername(), storeConnectionProperties.getPassword());
+        return store;
     }
 }
