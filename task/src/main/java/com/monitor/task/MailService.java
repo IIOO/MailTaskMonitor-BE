@@ -1,22 +1,28 @@
 package com.monitor.task;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.mail.*;
 import javax.mail.search.*;
 import java.util.*;
 
+@Slf4j
 @Service
 public class MailService {
-    private Logger log = Logger.getLogger(MailService.class);
+    private StoreConnectionProperties storeConnectionProperties;
+    private Store store;
 
     @Autowired
-    StoreConnectionProperties storeConnectionProperties;
+    public void setStoreConnectionProperties(StoreConnectionProperties storeConnectionProperties) {
+        this.storeConnectionProperties = storeConnectionProperties;
+    }
 
     Optional<List<Message>> getMails() throws Exception{
-        Store store = connect();
         Folder inbox = store.getFolder( "INBOX" );
         inbox.open( Folder.READ_ONLY );
 
@@ -41,7 +47,6 @@ public class MailService {
     Message getMailByNumber(int messageNumber) throws Exception {
         SearchTerm searchTerm = new MessageNumberTerm(messageNumber);
 
-        Store store = connect();
         Folder inbox = store.getFolder( "INBOX" );
         inbox.open( Folder.READ_ONLY );
         Message[] messages = inbox.search(searchTerm);
@@ -54,13 +59,18 @@ public class MailService {
         return null;
     }
 
-    private Store connect() throws Exception{
+    @PostConstruct
+    private void connect() throws Exception{
         Properties props = new Properties();
         props.setProperty("mail.imap.ssl.enable", "true");
         props.setProperty("mail.imaps.ssl.trust", "imap.gmail.com");
         Session session = Session.getDefaultInstance(props);
-        Store store = session.getStore("imaps");
+        this.store = session.getStore("imaps");
         store.connect(storeConnectionProperties.getHost(), 993, storeConnectionProperties.getUsername(), storeConnectionProperties.getPassword());
-        return store;
+    }
+
+    @PreDestroy
+    private void disconnect() throws MessagingException {
+        this.store.close();
     }
 }
