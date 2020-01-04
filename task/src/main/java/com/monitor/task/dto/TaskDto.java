@@ -11,10 +11,12 @@ import lombok.ToString;
 @ToString
 public class TaskDto extends TaskBasicInfo {
     String content;
+    int attachments;
 
     @Builder
-    public TaskDto(int id, String subject, String from, String content) {
+    public TaskDto(int id, String subject, String from, String content, int attachments) {
         super(id, subject, from);
         this.content = content;
+        this.attachments = attachments;
     }
 }
