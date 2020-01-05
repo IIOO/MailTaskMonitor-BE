@@ -1,4 +1,4 @@
-package com.monitor.task.service;
+package com.monitor.task.mail.service;
 
 import com.monitor.task.MailDownloadProperties;
 import lombok.extern.slf4j.Slf4j;

@@ -1,15 +1,14 @@
-package com.monitor.task;
+package com.monitor.task.mail;
 
-import com.monitor.task.dto.TaskDto;
-import com.monitor.task.dto.TaskPreviewDto;
+import com.monitor.task.mail.dto.TaskDto;
+import com.monitor.task.mail.dto.TaskPreviewDto;
 
 import javax.mail.*;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMultipart;
-import java.io.File;
 import java.io.IOException;
 
-public class MessageMapper {
+class MessageMapper {
     static TaskPreviewDto mapMessageToTaskPrevievDto(Message message) {
         TaskPreviewDto taskPreview = null;
         try {

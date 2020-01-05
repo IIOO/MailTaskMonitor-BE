@@ -1,4 +1,4 @@
-package com.monitor.task.service;
+package com.monitor.task.mail.service;
 
 import com.monitor.task.StoreConnectionProperties;
 import lombok.extern.slf4j.Slf4j;
@@ -24,7 +24,7 @@ public class MailService {
     }
 
     public Optional<List<Message>> getMails() {
-
+        List<Message> messageList = null;
         try {
             Folder inbox = store.getFolder( "INBOX" );
             inbox.open( Folder.READ_ONLY );
@@ -40,15 +40,14 @@ public class MailService {
                 } catch ( MessagingException e ) {
                     throw new RuntimeException( e );
                 }
-            } );
+            });
 
-            List<Message> messageList = Arrays.asList(messages);
-            return Optional.of(messageList);
+            messageList = Arrays.asList(messages);
         } catch (MessagingException e) {
             log.error("Error during reading mail messages");
             e.printStackTrace();
         }
-        return null;
+        return Optional.ofNullable(messageList);
     }
 
     public Message getMailByNumber(int messageNumber) {
