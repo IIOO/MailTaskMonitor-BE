@@ -1,6 +1,6 @@
 package com.monitor.task.mail.service;
 
-import com.monitor.task.StoreConnectionProperties;
+import com.monitor.task.config.StoreConnectionProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

@@ -1,6 +1,5 @@
 package com.monitor.task.mail;
 
-import com.monitor.task.mail.MessageMapper;
 import com.monitor.task.mail.dto.TaskDto;
 import com.monitor.task.mail.dto.TaskPreviewDto;
 import com.monitor.task.mail.service.AttachmentsDownloadService;

@@ -1,4 +1,4 @@
-package com.monitor.task;
+package com.monitor.task.config;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -7,10 +7,12 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
 
 @Component
-@ConfigurationProperties(prefix = "mail.download.attachment")
+@ConfigurationProperties(prefix = "store.connection")
 @PropertySource("classpath:application.properties")
 @Getter
 @Setter
-public class MailDownloadProperties {
-    private String path;
+public class StoreConnectionProperties {
+    private String host;
+    private String username;
+    private String password;
 }
