@@ -1,6 +1,7 @@
 package com.monitor.task.user.persistance;
 
 import com.monitor.task.common.CommonEntity;
+import com.monitor.task.user.Role;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -29,11 +30,11 @@ public class UserEntity extends CommonEntity {
     @Column(nullable = false)
     private String password;
 
-    @ManyToOne
-    private RoleEntity role;
+    @Enumerated
+    Role role;
 
     @Builder
-    public UserEntity(String name, String surname, String mail, String password, RoleEntity role) {
+    public UserEntity(String name, String surname, String mail, String password, Role role) {
         this.name = name;
         this.surname = surname;
         this.mail = mail;

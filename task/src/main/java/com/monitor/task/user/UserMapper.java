@@ -1,13 +1,12 @@
 package com.monitor.task.user;
 
+import com.monitor.task.user.dto.CreateUserDto;
 import com.monitor.task.user.dto.UserDto;
-import com.monitor.task.user.persistance.RoleEntity;
 import com.monitor.task.user.persistance.UserEntity;
 
-import java.util.Optional;
 
 public class UserMapper {
-    public static UserEntity mapToUserEntity(UserDto dto) {
+    public static UserEntity mapCreateUserToUserEntity(CreateUserDto dto) {
         return UserEntity.builder()
                 .name(dto.getName())
                 .surname(dto.getSurname())
@@ -22,7 +21,7 @@ public class UserMapper {
                 .name(entity.getName())
                 .surname(entity.getSurname())
                 .mail(entity.getMail())
-                .role(Optional.ofNullable(entity.getRole()).map(RoleEntity::getName).orElse(null))
+                .role(entity.getRole())
                 .build();
     }
 }
