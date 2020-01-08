@@ -22,12 +22,11 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserEntity save(UserEntity user) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        user.setRole(user.getRole());
         return userRepository.save(user);
     }
 
     @Override
-    public UserEntity findBySurname(String surname) {
-        return userRepository.findBySurname(surname);
+    public UserEntity findByUsername(String username) {
+        return userRepository.findUserEntityByUsername(username);
     }
 }

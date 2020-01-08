@@ -1,44 +1,75 @@
 package com.monitor.task.user.persistance;
 
 import com.monitor.task.common.CommonEntity;
-import com.monitor.task.user.Role;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
 @Getter
 @Setter
-@NoArgsConstructor
 @Table(name = "user")
-public class UserEntity extends CommonEntity {
+public class UserEntity extends CommonEntity implements UserDetails {
     @Id
     @GeneratedValue
     private UUID id;
 
-    private String name;
-
-    private String surname;
+    @Column(name = "username", nullable = false, unique = true)
+    private String username;
 
     private String mail;
 
     @Column(nullable = false)
     private String password;
 
-    @Enumerated
-    Role role;
+    @ManyToMany(targetEntity = RoleEntity.class, fetch = FetchType.EAGER)
+    @JoinTable(name = "user_roles",
+            joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"))
+    private List<GrantedAuthority> authorities;
+
+
+    public UserEntity() {
+        this.authorities = new ArrayList<>();
+    }
+
 
     @Builder
-    public UserEntity(String name, String surname, String mail, String password, Role role) {
-        this.name = name;
-        this.surname = surname;
+    public UserEntity(String username, String mail, String password, List<GrantedAuthority> authorities) {
+        this.username = username;
         this.mail = mail;
         this.password = password;
-        this.role = role;
+        this.authorities = authorities;
+    }
+
+    @Override
+    @Transient
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    @Transient
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    @Transient
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    @Transient
+    public boolean isEnabled() {
+        return true;
     }
 }

@@ -1,10 +1,11 @@
 package com.monitor.task.user.dto;
 
-import com.monitor.task.user.Role;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.security.core.GrantedAuthority;
 
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -12,8 +13,7 @@ import java.util.UUID;
 @Builder
 public class UserDto {
     private UUID id;
-    private String name;
-    private String surname;
+    private String username;
     private String mail;
-    private Role role;
+    private List<GrantedAuthority> authorities;
 }

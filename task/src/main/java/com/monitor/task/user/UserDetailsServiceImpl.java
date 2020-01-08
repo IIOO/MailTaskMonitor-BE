@@ -3,18 +3,13 @@ package com.monitor.task.user;
 import com.monitor.task.user.persistance.UserEntity;
 import com.monitor.task.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashSet;
 import java.util.Objects;
-import java.util.Set;
 
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
@@ -28,12 +23,11 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Override
     @Transactional(readOnly = true)
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        UserEntity user = userRepository.findBySurname(username);
-        if (Objects.isNull(user)) throw new UsernameNotFoundException(username);
+        UserEntity user = userRepository.findUserEntityByUsername(username);
+        if (Objects.nonNull(user)) {
+            return user;
+        }
+        throw new UsernameNotFoundException("User with username: " + username + " not found.");
 
-        Set<GrantedAuthority> grantedAuthorities = new HashSet<>();
-        grantedAuthorities.add(new SimpleGrantedAuthority(user.getRole().toString()));
-
-        return new User(user.getSurname(), user.getPassword(), grantedAuthorities);
     }
 }
