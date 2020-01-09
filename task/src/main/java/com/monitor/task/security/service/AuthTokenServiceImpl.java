@@ -1,15 +1,14 @@
 package com.monitor.task.security.service;
 
 import com.monitor.task.security.persistance.AuthTokenEntity;
-import com.monitor.task.user.persistance.UserEntity;
 import com.monitor.task.security.repository.AuthTokenRepository;
+import com.monitor.task.user.persistance.UserEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -43,7 +42,7 @@ public class AuthTokenServiceImpl implements AuthTokenService {
     }
 
     @Override
-    public AuthTokenEntity findById(UUID id) {
+    public AuthTokenEntity findById(Long id) {
         return authTokenRepository.findById(id).orElse(null);
     }
 

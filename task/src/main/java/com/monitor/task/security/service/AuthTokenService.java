@@ -4,7 +4,6 @@ import com.monitor.task.security.persistance.AuthTokenEntity;
 import com.monitor.task.user.persistance.UserEntity;
 
 import java.util.List;
-import java.util.UUID;
 
 public interface AuthTokenService {
     void update(AuthTokenEntity token);
@@ -15,7 +14,7 @@ public interface AuthTokenService {
 
     AuthTokenEntity create(UserEntity loggedUser);
 
-    AuthTokenEntity findById(UUID id);
+    AuthTokenEntity findById(Long id);
 
     List<AuthTokenEntity> findByUser(UserEntity user);
 }

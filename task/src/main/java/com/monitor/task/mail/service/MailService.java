@@ -1,6 +1,7 @@
 package com.monitor.task.mail.service;
 
 import com.monitor.task.config.StoreConnectionProperties;
+import com.sun.mail.imap.IMAPFolder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -8,8 +9,15 @@ import org.springframework.stereotype.Service;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.mail.*;
-import javax.mail.search.*;
-import java.util.*;
+import javax.mail.event.MessageCountAdapter;
+import javax.mail.event.MessageCountEvent;
+import javax.mail.search.FlagTerm;
+import javax.mail.search.MessageNumberTerm;
+import javax.mail.search.SearchTerm;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+import java.util.Properties;
 
 @Service
 @Slf4j
@@ -75,10 +83,13 @@ public class MailService {
         Properties props = new Properties();
         props.setProperty("mail.imap.ssl.enable", "true");
         props.setProperty("mail.imaps.ssl.trust", "imap.gmail.com");
+        // getDefaultInstance in order to use one session (otherwise to consider new props - use getInstance)
         Session session = Session.getDefaultInstance(props);
         try {
             this.store = session.getStore("imaps");
             store.connect(storeConnectionProperties.getHost(), 993, storeConnectionProperties.getUsername(), storeConnectionProperties.getPassword());
+            log.info("Connected to mail server");
+            setMessageCountListener();
         } catch (MessagingException e) {
             log.error("Couldn't connect to the store");
             e.printStackTrace();
@@ -88,5 +99,33 @@ public class MailService {
     @PreDestroy
     private void disconnect() throws MessagingException {
         this.store.close();
+        log.info("Disconnected form mail server");
+    }
+
+    private void setMessageCountListener() throws MessagingException{
+        IMAPFolder inbox = (IMAPFolder) store.getFolder("Inbox");
+        inbox.open(Folder.READ_WRITE);
+        inbox.addMessageCountListener(new MessageCountAdapter() {
+            @Override
+                public void messagesAdded(MessageCountEvent ev) {
+                    log.info("RECIEVED MAIL");
+                    // save to DB
+            }
+        });
+        new Thread(() -> {
+            while (store.isConnected()) {
+                try {
+                    Thread.sleep(1000);
+                    try {
+                        inbox.idle();
+                    } catch (MessagingException e) {
+                        e.printStackTrace();
+                    }
+                    log.info("In loop");
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
     }
 }

@@ -10,7 +10,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 @Entity
 @Getter
@@ -19,7 +18,7 @@ import java.util.UUID;
 public class UserEntity extends CommonEntity implements UserDetails {
     @Id
     @GeneratedValue
-    private UUID id;
+    private Long id;
 
     @Column(name = "username", nullable = false, unique = true)
     private String username;
