@@ -1,19 +1,22 @@
-package com.monitor.task.mail.persistance;
+package com.monitor.task.business.persistance;
 
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
 
 @Entity
 @Table(name = "mail_address")
+@Getter
+@Setter
 @NoArgsConstructor
 public class MailAddressEntity {
     @Id
     private String address;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "company_id")
     private CompanyEntity company;
 
     @Builder
@@ -21,4 +24,9 @@ public class MailAddressEntity {
         this.address = address;
         this.company = company;
     }
+
+    public MailAddressEntity(String address) {
+        this.address = address;
+    }
 }
+

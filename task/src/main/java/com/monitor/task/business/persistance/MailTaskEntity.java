@@ -1,12 +1,17 @@
-package com.monitor.task.mail.persistance;
+package com.monitor.task.business.persistance;
 
+import com.monitor.task.user.persistance.UserEntity;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
 
 @Entity
 @Table(name = "mail_task")
+@Getter
+@Setter
 @NoArgsConstructor
 public class MailTaskEntity {
     @Id
@@ -23,16 +28,21 @@ public class MailTaskEntity {
     private int numberOfAttachments;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private UserEntity user;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "group_id")
     private MailTaskGroupEntity group;
 
     @Builder
-    public MailTaskEntity(int messageNumber, String subject, MailAddressEntity from, String content, int numberOfAttachments, MailTaskGroupEntity group) {
+    public MailTaskEntity(int messageNumber, String subject, MailAddressEntity from, String content, int numberOfAttachments, UserEntity user, MailTaskGroupEntity group) {
         this.messageNumber = messageNumber;
         this.subject = subject;
         this.from = from;
         this.content = content;
         this.numberOfAttachments = numberOfAttachments;
+        this.user = user;
         this.group = group;
     }
 }

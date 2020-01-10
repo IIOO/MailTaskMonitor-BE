@@ -1,13 +1,13 @@
 package com.monitor.task.config;
 
-import com.monitor.task.mail.persistance.CompanyEntity;
-import com.monitor.task.mail.persistance.MailAddressEntity;
-import com.monitor.task.mail.persistance.MailTaskEntity;
-import com.monitor.task.mail.persistance.MailTaskGroupEntity;
-import com.monitor.task.mail.repository.CompanyRepository;
-import com.monitor.task.mail.repository.MailAddressRepository;
-import com.monitor.task.mail.repository.MailTaskGroupRepository;
-import com.monitor.task.mail.repository.MailTaskRepository;
+import com.monitor.task.business.persistance.CompanyEntity;
+import com.monitor.task.business.persistance.MailAddressEntity;
+import com.monitor.task.business.persistance.MailTaskEntity;
+import com.monitor.task.business.persistance.MailTaskGroupEntity;
+import com.monitor.task.business.repository.CompanyRepository;
+import com.monitor.task.business.repository.MailAddressRepository;
+import com.monitor.task.business.repository.MailTaskGroupRepository;
+import com.monitor.task.business.repository.MailTaskRepository;
 import com.monitor.task.user.Role;
 import com.monitor.task.user.persistance.RoleEntity;
 import com.monitor.task.user.persistance.UserEntity;

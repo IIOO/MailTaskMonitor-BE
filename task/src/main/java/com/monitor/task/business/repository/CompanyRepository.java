@@ -1,6 +1,6 @@
-package com.monitor.task.mail.repository;
+package com.monitor.task.business.repository;
 
-import com.monitor.task.mail.persistance.CompanyEntity;
+import com.monitor.task.business.persistance.CompanyEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

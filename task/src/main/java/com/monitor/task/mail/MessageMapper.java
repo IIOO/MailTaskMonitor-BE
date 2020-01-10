@@ -1,7 +1,7 @@
 package com.monitor.task.mail;
 
-import com.monitor.task.mail.dto.TaskDto;
-import com.monitor.task.mail.dto.TaskPreviewDto;
+import com.monitor.task.business.dto.TaskDto;
+import com.monitor.task.business.dto.TaskPreviewDto;
 
 import javax.mail.*;
 import javax.mail.internet.MimeBodyPart;

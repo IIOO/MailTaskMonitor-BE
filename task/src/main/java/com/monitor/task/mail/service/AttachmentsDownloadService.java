@@ -1,8 +1,8 @@
 package com.monitor.task.mail.service;
 
 import com.monitor.task.config.MailDownloadProperties;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.mail.Message;
@@ -15,13 +15,9 @@ import java.io.IOException;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class AttachmentsDownloadService {
-    private MailDownloadProperties mailDownloadProperties;
-
-    @Autowired
-    public AttachmentsDownloadService(MailDownloadProperties mailDownloadProperties) {
-        this.mailDownloadProperties = mailDownloadProperties;
-    }
+    private final MailDownloadProperties mailDownloadProperties;
 
     public boolean downloadAttachments(Message message) {
         // store attachment file name, separated by comma

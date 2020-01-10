@@ -12,6 +12,7 @@ import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.Objects;
+import java.util.UUID;
 
 @RequiredArgsConstructor
 public class TokenAuthenticationFilter implements Filter {
@@ -24,7 +25,7 @@ public class TokenAuthenticationFilter implements Filter {
         final String tokenId = request.getHeader(AppConst.AUTH_TOKEN_NAME);
 
         if (Objects.nonNull(tokenId)) {
-            AuthTokenEntity authToken = this.tokenService.findById(Long.parseLong(tokenId));
+            AuthTokenEntity authToken = this.tokenService.findById(UUID.fromString(tokenId));
 
             if (Objects.nonNull(authToken)) {
                 if (tokenService.isTokenExpired(authToken)) {

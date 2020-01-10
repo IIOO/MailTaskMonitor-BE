@@ -8,6 +8,7 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Entity
 @Table(name = "auth_tokens")
@@ -17,7 +18,7 @@ import java.time.LocalDateTime;
 public class AuthTokenEntity {
     @Id
     @GeneratedValue
-    private Long id;
+    private UUID id;
 
     @Column(name = "last_access_time", nullable = false)
     private LocalDateTime lastAccessTime;

@@ -1,4 +1,4 @@
-package com.monitor.task.mail.dto;
+package com.monitor.task.business.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

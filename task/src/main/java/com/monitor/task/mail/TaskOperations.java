@@ -1,7 +1,7 @@
 package com.monitor.task.mail;
 
-import com.monitor.task.mail.dto.TaskDto;
-import com.monitor.task.mail.dto.TaskPreviewDto;
+import com.monitor.task.business.dto.TaskDto;
+import com.monitor.task.business.dto.TaskPreviewDto;
 import com.monitor.task.mail.service.AttachmentsDownloadService;
 import com.monitor.task.mail.service.MailService;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -6,7 +6,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
-public interface AuthTokenRepository extends JpaRepository<AuthTokenEntity, Long> {
+public interface AuthTokenRepository extends JpaRepository<AuthTokenEntity, UUID> {
     Optional<List<AuthTokenEntity>> findByUser(UserEntity userEntity);
 }

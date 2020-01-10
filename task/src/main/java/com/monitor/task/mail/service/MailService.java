@@ -2,8 +2,8 @@ package com.monitor.task.mail.service;
 
 import com.monitor.task.config.StoreConnectionProperties;
 import com.sun.mail.imap.IMAPFolder;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -21,15 +21,11 @@ import java.util.Properties;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class MailService {
-    private StoreConnectionProperties storeConnectionProperties;
+    private final StoreConnectionProperties storeConnectionProperties;
     private Store store;
 
-
-    @Autowired
-    public MailService(StoreConnectionProperties storeConnectionProperties) {
-        this.storeConnectionProperties = storeConnectionProperties;
-    }
 
     public Optional<List<Message>> getMails() {
         List<Message> messageList = null;
