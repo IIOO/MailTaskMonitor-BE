@@ -51,8 +51,8 @@ public class Bootstrap implements InitializingBean {
         initializeRoles();
         initializeUsers();
 
-        createInitialMailTask(1, 2, createInitialMailAddress("Test"));
-        createInitialMailTaskGroup(2, 3);
+//        createInitialMailTask(1, 2, createInitialMailAddress("Test"));
+//        createInitialMailTaskGroup(2, 3);
     }
 
     private void initializeRoles() {

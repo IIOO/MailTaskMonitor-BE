@@ -4,22 +4,20 @@ import com.monitor.task.user.dto.UserDto;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 
 
 @Getter
 @NoArgsConstructor
-@ToString
 public class TaskDto extends TaskBasicInfo {
-    String content;
-    UserDto assignedUser;
-    int attachments;
+    private String content;
+    private UserDto assignedUser;
+    private int numberOfAttachments;
 
     @Builder
-    public TaskDto(int id, String subject, String from, String content, UserDto assignedUser, int attachments) {
+    public TaskDto(int id, String subject, String from, String content, UserDto assignedUser, int numberOfAttachments) {
         super(id, subject, from);
         this.content = content;
         this.assignedUser = assignedUser;
-        this.attachments = attachments;
+        this.numberOfAttachments = numberOfAttachments;
     }
 }

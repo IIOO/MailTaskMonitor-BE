@@ -8,6 +8,7 @@ import com.monitor.task.user.persistance.UserEntity;
 import com.monitor.task.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.NoResultException;
 import java.util.ArrayList;
@@ -24,11 +25,13 @@ public class MailTaskServiceImpl implements MailTaskService {
     private final UserRepository userRepository;
 
     @Override
+    @Transactional
     public MailTaskEntity save(MailTaskEntity mailTask) {
         return mailTaskRepository.save(mailTask);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<MailTaskEntity> findTasksByCompanyName(String companyName) {
         List<MailTaskEntity> allCompanyMails = new ArrayList<>();
         // find all email addresses related with given company
@@ -43,16 +46,19 @@ public class MailTaskServiceImpl implements MailTaskService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<MailTaskEntity> findTasksByFromAddress(String fromAddress) {
         return mailTaskRepository.findMailTaskEntitiesByFromAddress(fromAddress);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<MailTaskEntity> findTasksByUserId(Long userId) {
         return mailTaskRepository.findMailTaskEntitiesByUserId(userId);
     }
 
     @Override
+    @Transactional
     public MailTaskEntity assignTaskToUser(Integer taskNumber, String username) {
         MailTaskEntity updatedTask;
         Optional<UserEntity> user = userRepository.findUserEntityByUsername(username);
@@ -70,11 +76,13 @@ public class MailTaskServiceImpl implements MailTaskService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<MailTaskEntity> findAllUnassigned() {
         return mailTaskRepository.findMailTaskEntitiesByUserIsNull();
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<MailTaskEntity> getAll() {
         return mailTaskRepository.findAll();
     }

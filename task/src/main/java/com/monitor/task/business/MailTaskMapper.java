@@ -2,6 +2,7 @@ package com.monitor.task.business;
 
 import com.monitor.task.business.dto.TaskDto;
 import com.monitor.task.business.dto.TaskPreviewDto;
+import com.monitor.task.business.persistance.MailAddressEntity;
 import com.monitor.task.business.persistance.MailTaskEntity;
 import com.monitor.task.user.UserMapper;
 
@@ -20,8 +21,18 @@ public class MailTaskMapper {
                 .from(entity.getFrom().getAddress())
                 .subject(entity.getSubject())
                 .content(entity.getContent())
-                .attachments(entity.getNumberOfAttachments())
+                .numberOfAttachments(entity.getNumberOfAttachments())
                 .assignedUser(UserMapper.mapUserEntityToUserDto(entity.getUser()))
+                .build();
+    }
+
+    public static MailTaskEntity mapTaskDtoToMailTaskEntity(TaskDto dto) {
+        return MailTaskEntity.builder()
+                .messageNumber(dto.getId())
+                .from(new MailAddressEntity(dto.from))
+                .subject(dto.getSubject())
+                .content(dto.getContent())
+                .numberOfAttachments(dto.getNumberOfAttachments())
                 .build();
     }
 }

@@ -38,7 +38,7 @@ public class MailController {
     }
 
     @GetMapping("/fetch")
-    public ResponseEntity<List<TaskPreviewDto>> fetchFromMailToDb() {
-        return ResponseEntity.ok(taskOperations.getAllMails());
+    public ResponseEntity<List<TaskDto>> fetchFromMailToDb() {
+        return ResponseEntity.ok(taskOperations.fetchMailsToDb());
     }
 }

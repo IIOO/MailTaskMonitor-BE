@@ -23,6 +23,7 @@ public class MailTaskEntity {
     @JoinColumn(name = "from_address")
     private MailAddressEntity from;
 
+    @Column(columnDefinition = "TEXT")
     private String content;
 
     private int numberOfAttachments;
@@ -36,13 +37,11 @@ public class MailTaskEntity {
     private MailTaskGroupEntity group;
 
     @Builder
-    public MailTaskEntity(int messageNumber, String subject, MailAddressEntity from, String content, int numberOfAttachments, UserEntity user, MailTaskGroupEntity group) {
+    public MailTaskEntity(int messageNumber, String subject, MailAddressEntity from, String content, int numberOfAttachments) {
         this.messageNumber = messageNumber;
         this.subject = subject;
         this.from = from;
         this.content = content;
         this.numberOfAttachments = numberOfAttachments;
-        this.user = user;
-        this.group = group;
     }
 }

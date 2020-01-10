@@ -4,6 +4,7 @@ import com.monitor.task.business.dto.TaskDto;
 import com.monitor.task.business.dto.TaskPreviewDto;
 
 import javax.mail.*;
+import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMultipart;
 import java.io.IOException;
@@ -31,7 +32,7 @@ class MessageMapper {
                     .from(addressesToString(message))
                     .subject(readSubject(message))
                     .content(getTextFromMessage(message))
-                    .attachments(attachmentsCount(message))
+                    .numberOfAttachments(attachmentsCount(message))
                     .build();
         } catch (MessagingException | IOException ex) {
             ex.printStackTrace();
@@ -40,12 +41,8 @@ class MessageMapper {
     }
 
     private static String addressesToString(Message message) throws MessagingException {
-        StringBuilder fromString = new StringBuilder();
-        for ( Address adr : message.getFrom()) {
-            fromString.append(adr.toString());
-            fromString.append(", ");
-        }
-        return fromString.toString();
+        Address[] froms = message.getFrom();
+        return froms == null ? null : ((InternetAddress) froms[0]).getAddress();
     }
 
     private static String readSubject(Message message) throws MessagingException {
