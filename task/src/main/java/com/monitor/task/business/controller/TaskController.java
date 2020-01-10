@@ -1,13 +1,15 @@
 package com.monitor.task.business.controller;
 
 import com.monitor.task.business.MailTaskMapper;
+import com.monitor.task.business.dto.TaskDto;
 import com.monitor.task.business.dto.TaskPreviewDto;
+import com.monitor.task.business.persistance.MailTaskEntity;
 import com.monitor.task.business.service.MailTaskService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -35,6 +37,21 @@ public class TaskController {
         List<TaskPreviewDto> mapped = mailTaskService.findAllUnassigned().stream()
                 .map(MailTaskMapper::mapMailTaskEntityToTaskPreviewDto)
                 .collect(Collectors.toList());
-        return ResponseEntity.ok().body(mapped);
+        return ResponseEntity.ok(mapped);
+    }
+
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<TaskPreviewDto>> getUserTasks(@PathVariable("userId") final Long userId) {
+        List<TaskPreviewDto> mapped = mailTaskService.findTasksByUserId(userId).stream()
+                .map(MailTaskMapper::mapMailTaskEntityToTaskPreviewDto)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(mapped);
+    }
+
+    @PutMapping("{taskNumber}/assign")
+    public ResponseEntity<TaskDto> assignToLogged(@PathVariable("taskNumber") final int taskNumber,
+                                                  @AuthenticationPrincipal Object principal) {
+        MailTaskEntity updated = mailTaskService.assignTaskToUser(taskNumber, ((UserDetails)principal).getUsername());
+        return ResponseEntity.ok(MailTaskMapper.mapMailTaskEntityToTaskDto(updated));
     }
 }

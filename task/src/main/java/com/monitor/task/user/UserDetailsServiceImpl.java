@@ -1,6 +1,5 @@
 package com.monitor.task.user;
 
-import com.monitor.task.user.persistance.UserEntity;
 import com.monitor.task.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -8,8 +7,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Objects;
 
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
@@ -23,11 +20,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Override
     @Transactional(readOnly = true)
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        UserEntity user = userRepository.findUserEntityByUsername(username);
-        if (Objects.nonNull(user)) {
-            return user;
-        }
-        throw new UsernameNotFoundException("User with username: " + username + " not found.");
-
+        return userRepository.findUserEntityByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User with username: " + username + " not found."));
     }
 }
