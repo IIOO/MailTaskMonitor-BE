@@ -14,10 +14,7 @@ import javax.mail.event.MessageCountEvent;
 import javax.mail.search.FlagTerm;
 import javax.mail.search.MessageNumberTerm;
 import javax.mail.search.SearchTerm;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.Properties;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -27,8 +24,8 @@ public class MailService {
     private Store store;
 
 
-    public Optional<List<Message>> getMails() {
-        List<Message> messageList = null;
+    public List<Message> getMails() {
+        List<Message> messageList = new ArrayList<>();
         try {
             Folder inbox = store.getFolder( "INBOX" );
             inbox.open( Folder.READ_ONLY );
@@ -51,7 +48,7 @@ public class MailService {
             log.error("Error during reading mail messages");
             e.printStackTrace();
         }
-        return Optional.ofNullable(messageList);
+        return messageList;
     }
 
     public Message getMailByNumber(int messageNumber) {

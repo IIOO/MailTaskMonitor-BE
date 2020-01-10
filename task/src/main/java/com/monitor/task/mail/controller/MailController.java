@@ -24,16 +24,21 @@ public class MailController {
 
     @GetMapping
     public ResponseEntity<List<TaskPreviewDto>> getAllTasks() {
-        return taskOperations.getAllTasks().map(list -> ResponseEntity.ok().body(list)).orElse(ResponseEntity.noContent().build());
+        return ResponseEntity.ok(taskOperations.getAllMails());
     }
 
     @GetMapping("/{messageNumber}")
     public ResponseEntity<TaskDto> getTaskByNumber(@PathVariable("messageNumber") final int messageNumber) {
-        return taskOperations.getTask(messageNumber).map(task -> ResponseEntity.ok().body(task)).orElse(ResponseEntity.noContent().build());
+        return taskOperations.getMail(messageNumber).map(ResponseEntity::ok).orElse(ResponseEntity.noContent().build());
     }
 
     @GetMapping("/{messageNumber}/attachment/download")
     public ResponseEntity<Boolean> downloadAttachments(@PathVariable("messageNumber") final int messageNumber) {
-        return ResponseEntity.ok().body(taskOperations.downloadMessageAttachments(messageNumber));
+        return ResponseEntity.ok(taskOperations.downloadMessageAttachments(messageNumber));
+    }
+
+    @GetMapping("/fetch")
+    public ResponseEntity<List<TaskPreviewDto>> fetchFromMailToDb() {
+        return ResponseEntity.ok(taskOperations.getAllMails());
     }
 }

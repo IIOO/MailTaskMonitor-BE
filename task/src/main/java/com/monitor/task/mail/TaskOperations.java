@@ -25,14 +25,15 @@ public class TaskOperations {
     }
 
 
-    public Optional<List<TaskPreviewDto>> getAllTasks() {
-        List<TaskPreviewDto> tasks = mailService.getMails().map(list -> list.stream().map(MessageMapper::mapMessageToTaskPrevievDto).collect(Collectors.toList())).orElse(null);
-        return Optional.ofNullable(tasks);
+    public List<TaskPreviewDto> getAllMails() {
+        return mailService.getMails().stream()
+                .map(MessageMapper::mapMessageToTaskPrevievDto)
+                .collect(Collectors.toList());
     }
 
-    public Optional<TaskDto> getTask(int messageNumber) {
-        TaskDto taskPreviewDto = MessageMapper.mapMessageToTaskDto(mailService.getMailByNumber(messageNumber));
-        return Optional.ofNullable(taskPreviewDto);
+    public Optional<TaskDto> getMail(int messageNumber) {
+        Optional<Message> message = Optional.ofNullable(mailService.getMailByNumber(messageNumber));
+        return message.map(MessageMapper::mapMessageToTaskDto);
     }
 
     public boolean downloadMessageAttachments(int messageNumber) {
