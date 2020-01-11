@@ -48,7 +48,8 @@ public class TaskController {
         return ResponseEntity.ok(mapped);
     }
 
-    @PutMapping("{taskNumber}/assign")
+    // post because partial data change
+    @PostMapping("{taskNumber}/assign")
     public ResponseEntity<TaskDto> assignToLogged(@PathVariable("taskNumber") final int taskNumber,
                                                   @AuthenticationPrincipal Object principal) {
         MailTaskEntity updated = mailTaskService.assignTaskToUser(taskNumber, ((UserDetails)principal).getUsername());

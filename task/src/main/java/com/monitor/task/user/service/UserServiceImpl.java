@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.NoResultException;
+
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -27,6 +29,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserEntity findByUsername(String username) {
-        return userRepository.findUserEntityByUsername(username).orElse(null);
+        return userRepository.findUserEntityByUsername(username)
+                .orElseThrow(() -> new NoResultException("No user: " + username + " found"));
     }
 }
