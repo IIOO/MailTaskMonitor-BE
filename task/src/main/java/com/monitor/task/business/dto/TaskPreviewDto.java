@@ -1,5 +1,6 @@
 package com.monitor.task.business.dto;
 
+import com.monitor.task.business.MailTaskStatus;
 import lombok.*;
 
 
@@ -9,7 +10,7 @@ import lombok.*;
 public class TaskPreviewDto extends TaskBasicInfo {
 
     @Builder
-    public TaskPreviewDto(int id, String subject, String from) {
-        super(id, subject, from);
+    public TaskPreviewDto(int id, String subject, String from, MailTaskStatus status) {
+        super(id, subject, from, status);
     }
 }

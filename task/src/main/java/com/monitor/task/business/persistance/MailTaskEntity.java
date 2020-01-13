@@ -1,5 +1,6 @@
 package com.monitor.task.business.persistance;
 
+import com.monitor.task.business.MailTaskStatus;
 import com.monitor.task.user.persistance.UserEntity;
 import lombok.Builder;
 import lombok.Getter;
@@ -20,13 +21,16 @@ public class MailTaskEntity {
     private String subject;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "from_address")
+    @JoinColumn(name = "address_id")
     private MailAddressEntity from;
 
     @Column(columnDefinition = "TEXT")
     private String content;
 
     private int numberOfAttachments;
+
+    @Enumerated(EnumType.STRING)
+    private MailTaskStatus status;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
@@ -43,5 +47,6 @@ public class MailTaskEntity {
         this.from = from;
         this.content = content;
         this.numberOfAttachments = numberOfAttachments;
+        status = MailTaskStatus.TO_DO;
     }
 }

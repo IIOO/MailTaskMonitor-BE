@@ -1,8 +1,8 @@
 package com.monitor.task.mail.controller;
 
 import com.monitor.task.business.dto.TaskDto;
-import com.monitor.task.business.dto.TaskPreviewDto;
 import com.monitor.task.mail.TaskOperations;
+import com.monitor.task.mail.dto.MailDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,7 +23,7 @@ public class MailController {
     }
 
     @GetMapping
-    public ResponseEntity<List<TaskPreviewDto>> getAllTasks() {
+    public ResponseEntity<List<MailDto>> getAllTasks() {
         return ResponseEntity.ok(taskOperations.getAllMails());
     }
 

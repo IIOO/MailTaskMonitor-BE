@@ -1,5 +1,6 @@
 package com.monitor.task.business.service;
 
+import com.monitor.task.business.MailTaskStatus;
 import com.monitor.task.business.persistance.MailTaskEntity;
 
 import java.util.List;
@@ -12,4 +13,5 @@ public interface MailTaskService {
     List<MailTaskEntity> findAllUnassigned();
     List<MailTaskEntity> getAll();
     MailTaskEntity assignTaskToUser(Integer taskNumber, String user);
+    MailTaskEntity changeTaskStatus(Integer taskNumber, MailTaskStatus status);
 }

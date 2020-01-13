@@ -1,5 +1,6 @@
 package com.monitor.task.business.service;
 
+import com.monitor.task.business.MailTaskStatus;
 import com.monitor.task.business.persistance.MailAddressEntity;
 import com.monitor.task.business.persistance.MailTaskEntity;
 import com.monitor.task.business.persistance.MailTaskHistoryEntity;
@@ -9,6 +10,7 @@ import com.monitor.task.business.repository.MailTaskRepository;
 import com.monitor.task.user.persistance.UserEntity;
 import com.monitor.task.user.service.UserService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class MailTaskServiceImpl implements MailTaskService {
     private final MailAddressRepository mailAddressRepository;
@@ -62,7 +65,7 @@ public class MailTaskServiceImpl implements MailTaskService {
 
     @Override
     @Transactional
-    public MailTaskEntity assignTaskToUser(int taskNumber, String username) {
+    public MailTaskEntity assignTaskToUser(Integer taskNumber, String username) {
         UserEntity user = userService.findByUsername(username);
         MailTaskEntity mailTask = getByMessageNumber(taskNumber);
 
@@ -85,10 +88,29 @@ public class MailTaskServiceImpl implements MailTaskService {
         return mailTaskRepository.findAll();
     }
 
+    @Override
+    @Transactional
+    public MailTaskEntity changeTaskStatus(Integer taskNumber, MailTaskStatus status) {
+        MailTaskEntity mailTask = getByMessageNumber(taskNumber);
+
+        if (!status.equals(mailTask.getStatus())) {
+            mailTask.setStatus(status);
+
+            // create history record of change
+            createMailTaskHistory(mailTask);
+            mailTask = mailTaskRepository.save(mailTask);
+        } else {
+            log.info("New status same as old, no changes.");
+        }
+        return mailTask;
+    }
+
     private void createMailTaskHistory(MailTaskEntity task) {
         mailTaskHistoryRepository.save(MailTaskHistoryEntity.builder()
+                .task(task)
                 .user(task.getUser())
                 .group(task.getGroup())
+                .status(task.getStatus())
                 .build());
     }
 

@@ -14,6 +14,10 @@ import javax.persistence.*;
 @NoArgsConstructor
 public class MailAddressEntity {
     @Id
+    @GeneratedValue
+    private Long id;
+
+    @Column(unique = true)
     private String address;
 
     @ManyToOne(fetch = FetchType.LAZY)

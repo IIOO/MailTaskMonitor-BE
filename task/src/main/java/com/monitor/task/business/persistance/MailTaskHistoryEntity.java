@@ -1,5 +1,6 @@
 package com.monitor.task.business.persistance;
 
+import com.monitor.task.business.MailTaskStatus;
 import com.monitor.task.user.persistance.UserEntity;
 import lombok.Builder;
 import lombok.Getter;
@@ -19,6 +20,9 @@ public class MailTaskHistoryEntity {
     @GeneratedValue
     private Long id;
 
+    @OneToOne
+    private MailTaskEntity task;
+
     @Column(nullable = false, updatable = false)
     private LocalDateTime creationDate;
 
@@ -28,11 +32,14 @@ public class MailTaskHistoryEntity {
     @OneToOne
     private MailTaskGroupEntity group;
 
+    private MailTaskStatus status;
 
     @Builder
-    public MailTaskHistoryEntity(UserEntity user, MailTaskGroupEntity group) {
+    public MailTaskHistoryEntity(MailTaskEntity task, UserEntity user, MailTaskGroupEntity group, MailTaskStatus status) {
+        this.task = task;
         this.user = user;
         this.group = group;
+        this.status = status;
     }
 
     @PrePersist

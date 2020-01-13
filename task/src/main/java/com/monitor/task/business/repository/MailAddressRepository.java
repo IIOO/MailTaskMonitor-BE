@@ -8,6 +8,5 @@ import java.util.Optional;
 
 public interface MailAddressRepository extends JpaRepository<MailAddressEntity, String> {
     Optional<MailAddressEntity> findByAddress(String address);
-
     List<MailAddressEntity> findMailAddressEntitiesByCompanyName(String companyName);
 }

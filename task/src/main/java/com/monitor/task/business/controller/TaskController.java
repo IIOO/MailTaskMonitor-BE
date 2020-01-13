@@ -1,6 +1,7 @@
 package com.monitor.task.business.controller;
 
 import com.monitor.task.business.MailTaskMapper;
+import com.monitor.task.business.command.ChangeStatusCommand;
 import com.monitor.task.business.dto.TaskDto;
 import com.monitor.task.business.dto.TaskPreviewDto;
 import com.monitor.task.business.persistance.MailTaskEntity;
@@ -53,6 +54,14 @@ public class TaskController {
     public ResponseEntity<TaskDto> assignToLogged(@PathVariable("taskNumber") final int taskNumber,
                                                   @AuthenticationPrincipal Object principal) {
         MailTaskEntity updated = mailTaskService.assignTaskToUser(taskNumber, ((UserDetails)principal).getUsername());
+        return ResponseEntity.ok(MailTaskMapper.mapMailTaskEntityToTaskDto(updated));
+    }
+
+    // post because partial data change
+    @PostMapping("{taskNumber}/status")
+    public ResponseEntity<TaskDto> changeStatus(@PathVariable("taskNumber") final int taskNumber,
+                                                @RequestBody final ChangeStatusCommand command) {
+        MailTaskEntity updated = mailTaskService.changeTaskStatus(taskNumber, command.getStatus());
         return ResponseEntity.ok(MailTaskMapper.mapMailTaskEntityToTaskDto(updated));
     }
 }
