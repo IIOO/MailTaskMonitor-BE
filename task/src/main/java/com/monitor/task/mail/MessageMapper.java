@@ -1,7 +1,7 @@
 package com.monitor.task.mail;
 
 import com.monitor.task.business.dto.TaskDto;
-import com.monitor.task.business.dto.TaskPreviewDto;
+import com.monitor.task.mail.dto.MailDto;
 
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;
@@ -9,21 +9,7 @@ import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMultipart;
 import java.io.IOException;
 
-class MessageMapper {
-    static TaskPreviewDto mapMessageToTaskPrevievDto(Message message) {
-        TaskPreviewDto taskPreview = null;
-        try {
-            taskPreview = TaskPreviewDto.builder()
-            .id(message.getMessageNumber())
-            .from(addressesToString(message))
-            .subject(readSubject(message))
-            .build();
-        } catch (MessagingException ex) {
-            ex.printStackTrace();
-        }
-        return taskPreview;
-    }
-
+public class MessageMapper {
     static TaskDto mapMessageToTaskDto(Message message) {
         TaskDto task = null;
         try {
@@ -40,13 +26,32 @@ class MessageMapper {
         return task;
     }
 
+    static MailDto mapMessageToMailDto(Message message) {
+        MailDto mail = null;
+        try {
+            mail = MailDto.builder()
+                    .id(message.getMessageNumber())
+                    .from(addressesToString(message))
+                    .subject(readSubject(message))
+                    .build();
+        } catch (MessagingException ex) {
+            ex.printStackTrace();
+        }
+        return mail;
+    }
+
     private static String addressesToString(Message message) throws MessagingException {
         Address[] froms = message.getFrom();
         return froms == null ? null : ((InternetAddress) froms[0]).getAddress();
     }
 
-    private static String readSubject(Message message) throws MessagingException {
-        return  message.getSubject();
+    public static String readSubject(Message message) {
+        try {
+            return  message.getSubject();
+        } catch (MessagingException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     private static String getTextFromMessage(Message message) throws MessagingException, IOException {

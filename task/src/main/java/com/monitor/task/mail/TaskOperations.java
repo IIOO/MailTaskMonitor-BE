@@ -2,10 +2,11 @@ package com.monitor.task.mail;
 
 import com.monitor.task.business.MailTaskMapper;
 import com.monitor.task.business.dto.TaskDto;
-import com.monitor.task.business.dto.TaskPreviewDto;
 import com.monitor.task.business.persistance.MailAddressEntity;
-import com.monitor.task.business.repository.MailAddressRepository;
+import com.monitor.task.business.persistance.MailTaskEntity;
+import com.monitor.task.business.service.MailAddressService;
 import com.monitor.task.business.service.MailTaskService;
+import com.monitor.task.mail.dto.MailDto;
 import com.monitor.task.mail.service.AttachmentsDownloadService;
 import com.monitor.task.mail.service.MailService;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.mail.Message;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -28,37 +30,65 @@ public class TaskOperations {
 
     private final AttachmentsDownloadService attachmentsDownloadService;
 
-    private final MailAddressRepository mailAddressRepository;
+    private final MailAddressService mailAddressService;
 
-
-    public List<TaskPreviewDto> getAllMails() {
+    /**
+     * Get mails to display directly form mail server
+     * @return list of mapped messages containing basic information to display
+     */
+    public List<MailDto> getAllMails() {
         return mailService.getMails().stream()
-                .map(MessageMapper::mapMessageToTaskPrevievDto)
+                .map(MessageMapper::mapMessageToMailDto)
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Get mail message details by it's number, directly from mail server
+     * @param messageNumber number which identify message on mail server
+     * @return mapped mail message details to display
+     */
     public Optional<TaskDto> getMail(int messageNumber) {
         Optional<Message> message = Optional.ofNullable(mailService.getMailByNumber(messageNumber));
         return message.map(MessageMapper::mapMessageToTaskDto);
     }
 
+    /**
+     * Download attachments directly from mail server to local disc
+     * Path is specified by class MailDownloadProperties
+     * @param messageNumber number which identify message on mail server
+     * @return true if there are some attachments
+     */
     public boolean downloadMessageAttachments(int messageNumber) {
         Message message = mailService.getMailByNumber(messageNumber);
         return attachmentsDownloadService.downloadAttachments(message);
     }
 
-    @Transactional
     public List<TaskDto> fetchMailsToDb() {
-        //TODO fix design
-        List<TaskDto> taskDtos = mailService.getMails().stream()
+        List<MailTaskEntity> saved = new ArrayList<>();
+
+        List<TaskDto> taskDtos = mailService.getMailsWithMatchingSubject().stream()
                 .map(MessageMapper::mapMessageToTaskDto)
                 .collect(Collectors.toList());
-        log.info("Mails fetched, saving... " + taskDtos.size());
-        log.info(taskDtos.toString());
+        log.info(taskDtos.size() + " mails fetched, saving... ");
         taskDtos.forEach(task -> {
-            mailAddressRepository.saveAndFlush(new MailAddressEntity(task.getFrom()));
-            mailTaskService.save(MailTaskMapper.mapTaskDtoToMailTaskEntity(task));
+            saved.add(saveMappedMailTaskToDb(task));
         });
-        return taskDtos;
+        log.info("Saved " + saved.size() + " tasks to DB.");
+        return saved.stream()
+                .map(MailTaskMapper::mapMailTaskEntityToTaskDto)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public MailTaskEntity saveMappedMailTaskToDb(TaskDto dto) {
+        MailAddressEntity mailAddress = mailAddressService.findOrCreate(dto.getFrom());
+        MailTaskEntity mailTask = MailTaskEntity.builder()
+                .messageNumber(dto.getId())
+                .from(mailAddress)
+                .subject(dto.getSubject())
+                .content(dto.getContent())
+                .numberOfAttachments(dto.getNumberOfAttachments())
+                .build();
+        return mailTaskService.save(mailTask);
     }
 }
