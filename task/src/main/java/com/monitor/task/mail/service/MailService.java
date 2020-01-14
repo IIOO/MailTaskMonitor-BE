@@ -1,5 +1,7 @@
 package com.monitor.task.mail.service;
 
+import com.monitor.task.business.persistance.MailTaskEntity;
+import com.monitor.task.business.service.MailTaskService;
 import com.monitor.task.config.StoreConnectionProperties;
 import com.monitor.task.mail.MessageMapper;
 import com.monitor.task.mail.SearchTermBuilder;
@@ -21,7 +23,6 @@ import java.util.Properties;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -29,18 +30,17 @@ import java.util.stream.Collectors;
 public class MailService {
     private final Message[] NO_MESSAGES = {};
     private final StoreConnectionProperties storeConnectionProperties;
+    private final MailTaskService mailTaskService;
 
     private Store store;
     private IMAPFolder inbox;
 
     public List<Message> getMailsWithMatchingSubject() {
-        Message[] messages = getMessages(SearchTermBuilder.getSubjectSearchTerm());
-        return Arrays.asList(messages);
+        return Arrays.asList(getMessages(SearchTermBuilder.getSubjectSearchTerm()));
     }
 
     public List<Message> getMails() {
-        Message[] messages = getMessages(null);
-        return Arrays.asList(messages);
+        return Arrays.asList(getMessages(null));
     }
 
     public Message getMailByNumber(int messageNumber) {
@@ -56,8 +56,6 @@ public class MailService {
 
     private Message[] getMessages(SearchTerm searchTerm) {
         try {
-//            Folder inbox = store.getFolder( "INBOX" );
-//            inbox.open( Folder.READ_ONLY );
             if (Objects.nonNull(searchTerm)) {
                 return inbox.search(searchTerm);
             } else {
@@ -113,11 +111,14 @@ public class MailService {
         inbox.addMessageCountListener(new MessageCountAdapter() {
             @Override
                 public void messagesAdded(MessageCountEvent ev) {
-                    log.info("RECIEVED MAIL");
-                    //TODO save to DB
+                    log.info("RECEIVED MAIL (Before subject & from check)");
                     Arrays.stream(ev.getMessages())
                             .filter(msg -> SearchTermBuilder.stringMatchSubjectPattern(MessageMapper.readSubject(msg)))
-                            .collect(Collectors.toList());
+                            .map(MessageMapper::mapMessageToTaskDto)
+                            .forEach(task -> {
+                                MailTaskEntity saved = mailTaskService.saveMappedMailTaskToDb(task);
+                                log.info("NEW MAIL SAVED TO DB: " + saved.getMessageNumber());
+                            });
             }
         });
         new Thread(() -> {

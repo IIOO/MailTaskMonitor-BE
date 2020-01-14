@@ -1,10 +1,10 @@
 package com.monitor.task.business.service;
 
 import com.monitor.task.business.MailTaskStatus;
+import com.monitor.task.business.dto.TaskDto;
 import com.monitor.task.business.persistance.MailAddressEntity;
 import com.monitor.task.business.persistance.MailTaskEntity;
 import com.monitor.task.business.persistance.MailTaskHistoryEntity;
-import com.monitor.task.business.repository.MailAddressRepository;
 import com.monitor.task.business.repository.MailTaskHistoryRepository;
 import com.monitor.task.business.repository.MailTaskRepository;
 import com.monitor.task.user.persistance.UserEntity;
@@ -22,11 +22,11 @@ import java.util.List;
 @Slf4j
 @RequiredArgsConstructor
 public class MailTaskServiceImpl implements MailTaskService {
-    private final MailAddressRepository mailAddressRepository;
-
     private final MailTaskRepository mailTaskRepository;
 
     private final MailTaskHistoryRepository mailTaskHistoryRepository;
+
+    private final MailAddressService mailAddressService;
 
     private final UserService userService;
 
@@ -36,12 +36,25 @@ public class MailTaskServiceImpl implements MailTaskService {
         return mailTaskRepository.save(mailTask);
     }
 
+    @Transactional
+    public MailTaskEntity saveMappedMailTaskToDb(TaskDto dto) {
+        MailAddressEntity mailAddress = mailAddressService.findOrCreate(dto.getFrom());
+        MailTaskEntity mailTask = MailTaskEntity.builder()
+                .messageNumber(dto.getId())
+                .from(mailAddress)
+                .subject(dto.getSubject())
+                .content(dto.getContent())
+                .numberOfAttachments(dto.getNumberOfAttachments())
+                .build();
+        return save(mailTask);
+    }
+
     @Override
     @Transactional(readOnly = true)
     public List<MailTaskEntity> findTasksByCompanyName(String companyName) {
         List<MailTaskEntity> allCompanyMails = new ArrayList<>();
         // find all email addresses related with given company
-        List<MailAddressEntity> companyEmailAddresses = mailAddressRepository.findMailAddressEntitiesByCompanyName(companyName);
+        List<MailAddressEntity> companyEmailAddresses = mailAddressService.findByCompanyName(companyName);
 
         // for every company email address fetch their mails
         companyEmailAddresses.forEach(address -> {

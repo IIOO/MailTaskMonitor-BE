@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -20,5 +21,10 @@ public class MailAddressServiceImpl implements MailAddressService {
     public MailAddressEntity findOrCreate(String address) {
         Optional<MailAddressEntity> mailAddress = mailAddressRepository.findByAddress(address);
         return mailAddress.orElseGet(() -> mailAddressRepository.save(MailAddressEntity.builder().address(address).build()));
+    }
+
+    @Override
+    public List<MailAddressEntity> findByCompanyName(String companyName) {
+        return mailAddressRepository.findMailAddressEntitiesByCompanyName(companyName);
     }
 }

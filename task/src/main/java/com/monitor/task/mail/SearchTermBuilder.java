@@ -7,7 +7,7 @@ import javax.mail.search.SearchTerm;
 import java.util.regex.Pattern;
 
 public class SearchTermBuilder {
-    private static final Pattern SUBJECT_PATTERN = Pattern.compile("([Zz]lecenie)[\\s](odprawy)[\\s](numer|nr)[\\s:\\.](\\d+)");
+    private static final Pattern SUBJECT_PATTERN = Pattern.compile(".*([Zz]lecenie)[\\s](odprawy)[\\s](numer|nr)[\\s:\\.](\\d+)");
 
     public static SearchTerm getSubjectSearchTerm() {
         return new SearchTerm() {

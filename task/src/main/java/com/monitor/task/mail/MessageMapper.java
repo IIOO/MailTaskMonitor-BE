@@ -10,7 +10,7 @@ import javax.mail.internet.MimeMultipart;
 import java.io.IOException;
 
 public class MessageMapper {
-    static TaskDto mapMessageToTaskDto(Message message) {
+    public static TaskDto mapMessageToTaskDto(Message message) {
         TaskDto task = null;
         try {
             task = TaskDto.builder()

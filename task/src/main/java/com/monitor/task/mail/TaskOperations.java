@@ -2,9 +2,7 @@ package com.monitor.task.mail;
 
 import com.monitor.task.business.MailTaskMapper;
 import com.monitor.task.business.dto.TaskDto;
-import com.monitor.task.business.persistance.MailAddressEntity;
 import com.monitor.task.business.persistance.MailTaskEntity;
-import com.monitor.task.business.service.MailAddressService;
 import com.monitor.task.business.service.MailTaskService;
 import com.monitor.task.mail.dto.MailDto;
 import com.monitor.task.mail.service.AttachmentsDownloadService;
@@ -12,7 +10,6 @@ import com.monitor.task.mail.service.MailService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.mail.Message;
 import java.util.ArrayList;
@@ -30,7 +27,6 @@ public class TaskOperations {
 
     private final AttachmentsDownloadService attachmentsDownloadService;
 
-    private final MailAddressService mailAddressService;
 
     /**
      * Get mails to display directly form mail server
@@ -71,24 +67,11 @@ public class TaskOperations {
                 .collect(Collectors.toList());
         log.info(taskDtos.size() + " mails fetched, saving... ");
         taskDtos.forEach(task -> {
-            saved.add(saveMappedMailTaskToDb(task));
+            saved.add(mailTaskService.saveMappedMailTaskToDb(task));
         });
         log.info("Saved " + saved.size() + " tasks to DB.");
         return saved.stream()
                 .map(MailTaskMapper::mapMailTaskEntityToTaskDto)
                 .collect(Collectors.toList());
-    }
-
-    @Transactional
-    public MailTaskEntity saveMappedMailTaskToDb(TaskDto dto) {
-        MailAddressEntity mailAddress = mailAddressService.findOrCreate(dto.getFrom());
-        MailTaskEntity mailTask = MailTaskEntity.builder()
-                .messageNumber(dto.getId())
-                .from(mailAddress)
-                .subject(dto.getSubject())
-                .content(dto.getContent())
-                .numberOfAttachments(dto.getNumberOfAttachments())
-                .build();
-        return mailTaskService.save(mailTask);
     }
 }
