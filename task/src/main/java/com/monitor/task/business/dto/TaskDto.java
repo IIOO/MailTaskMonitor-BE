@@ -15,7 +15,7 @@ public class TaskDto extends TaskBasicInfo {
     private int numberOfAttachments;
 
     @Builder
-    public TaskDto(int id, String subject, String from, MailTaskStatus status, String content, UserDto assignedUser, int numberOfAttachments) {
+    public TaskDto(Long id, String subject, String from, MailTaskStatus status, String content, UserDto assignedUser, int numberOfAttachments) {
         super(id, subject, from, status);
         this.content = content;
         this.assignedUser = assignedUser;

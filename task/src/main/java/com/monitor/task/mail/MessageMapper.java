@@ -14,7 +14,7 @@ public class MessageMapper {
         TaskDto task = null;
         try {
             task = TaskDto.builder()
-                    .id(message.getMessageNumber())
+                    .id(Integer.toUnsignedLong(message.getMessageNumber()))
                     .from(addressesToString(message))
                     .subject(readSubject(message))
                     .content(getTextFromMessage(message))

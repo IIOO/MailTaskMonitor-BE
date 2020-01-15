@@ -1,5 +1,6 @@
 package com.monitor.task.business.persistance;
 
+import com.monitor.task.user.persistance.UserEntity;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,10 +17,18 @@ import javax.persistence.Table;
 @NoArgsConstructor
 public class CompanyEntity {
     @Id
+    private Long id;
+
     private String name;
 
+    @OneToOne(fetch = FetchType.LAZY)
+    @MapsId
+    private UserEntity user;
+
     @Builder
-    public CompanyEntity(String name) {
+    public CompanyEntity(Long id, String name, UserEntity user) {
+        this.id = id;
         this.name = name;
+        this.user = user;
     }
 }

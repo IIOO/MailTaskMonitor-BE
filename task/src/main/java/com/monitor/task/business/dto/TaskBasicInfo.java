@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public abstract class TaskBasicInfo {
-    public int id;
+    public Long id;
     public String subject;
     public String from;
     private MailTaskStatus status;

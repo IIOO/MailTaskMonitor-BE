@@ -10,7 +10,7 @@ import lombok.*;
 public class TaskPreviewDto extends TaskBasicInfo {
 
     @Builder
-    public TaskPreviewDto(int id, String subject, String from, MailTaskStatus status) {
+    public TaskPreviewDto(Long id, String subject, String from, MailTaskStatus status) {
         super(id, subject, from, status);
     }
 }

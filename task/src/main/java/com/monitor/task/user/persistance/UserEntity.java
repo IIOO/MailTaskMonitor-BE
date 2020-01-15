@@ -23,8 +23,6 @@ public class UserEntity extends CommonEntity implements UserDetails {
     @Column(name = "username", nullable = false, unique = true)
     private String username;
 
-    private String mail;
-
     @Column(nullable = false)
     private String password;
 
@@ -41,9 +39,8 @@ public class UserEntity extends CommonEntity implements UserDetails {
 
 
     @Builder
-    public UserEntity(String username, String mail, String password, List<GrantedAuthority> authorities) {
+    public UserEntity(String username, String password, List<GrantedAuthority> authorities) {
         this.username = username;
-        this.mail = mail;
         this.password = password;
         this.authorities = authorities;
     }

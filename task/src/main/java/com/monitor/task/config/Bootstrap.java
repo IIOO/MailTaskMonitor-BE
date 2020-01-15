@@ -3,7 +3,6 @@ package com.monitor.task.config;
 import com.monitor.task.business.persistance.CompanyEntity;
 import com.monitor.task.business.persistance.MailAddressEntity;
 import com.monitor.task.business.persistance.MailTaskEntity;
-import com.monitor.task.business.persistance.MailTaskGroupEntity;
 import com.monitor.task.business.repository.CompanyRepository;
 import com.monitor.task.business.repository.MailAddressRepository;
 import com.monitor.task.business.repository.MailTaskGroupRepository;
@@ -19,6 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
@@ -28,20 +28,15 @@ import java.util.*;
 @Slf4j
 public class Bootstrap implements InitializingBean {
     private static final String DEFAULT_PASSWORD = "password";
+    private static Long taskId = 1L;
 
     private final UserService userService;
 
     private final RoleRepository roleRepository;
-
     private final RoleService roleService;
-
-
     private final CompanyRepository companyRepository;
-
     private final MailAddressRepository mailAddressRepository;
-
     private final MailTaskRepository mailTaskRepository;
-
     private final MailTaskGroupRepository mailTaskGroupRepository;
 
 
@@ -49,10 +44,21 @@ public class Bootstrap implements InitializingBean {
     public void afterPropertiesSet() {
         log.info("Running bootstrap");
         initializeRoles();
-        initializeUsers();
+        List<UserEntity> users = initializeUsers();
 
-//        createInitialMailTask(1, 2, createInitialMailAddress("Test"));
-//        createInitialMailTaskGroup(2, 3);
+        List<CompanyEntity> companies = createInitialCompanies(users);
+
+        // addresses by company
+        HashMap<Integer, List<MailAddressEntity>> addresses = createInitialMailAddresses(companies, 2);
+
+        HashMap<Integer, List<MailTaskEntity>> tasksByCompany = new HashMap<>();
+        List<MailTaskEntity> compZeroTasks = createInitialMailTasks(addresses.get(0), 5);
+        List<MailTaskEntity> compOneTasks = createInitialMailTasks(addresses.get(1), 2);
+//        List<MailTaskEntity> compTwoTasks = createInitialMailTasks(addresses.get(2));
+        tasksByCompany.put(0, compZeroTasks);
+        tasksByCompany.put(1, compOneTasks);
+//        tasksByCompany.put(2, compTwoTasks);
+
     }
 
     private void initializeRoles() {
@@ -63,67 +69,95 @@ public class Bootstrap implements InitializingBean {
         roleRepository.flush();
     }
 
-    private void initializeUsers() {
-        userService.save(createBootstrapAdmin());
-        userService.save(createBootstrapUser());
+    private List<UserEntity> initializeUsers() {
+        createBootstrapAdmin();
+        createBootstrapEmployee();
+
+        UserEntity clientZero = createBootstrapClient("Zero");
+        UserEntity clientOne = createBootstrapClient("One");
+        UserEntity clientTwo = createBootstrapClient("Two");
+        log.info("Users initialized");
+        return Arrays.asList(clientZero, clientOne, clientTwo);
     }
 
-    private UserEntity createBootstrapAdmin() {
-        return UserEntity.builder()
-                .username("ASurname")
-                .mail("admin.surname@test.pl")
+    private List<CompanyEntity> createInitialCompanies(List<UserEntity> clients) {
+        List<CompanyEntity> companies = new ArrayList<>();
+        for (UserEntity client : clients) {
+            CompanyEntity company = CompanyEntity.builder()
+                    .id(client.getId())
+                    .name(client.getUsername() + "POL")
+                    .user(client)
+                    .build();
+            companies.add(companyRepository.saveAndFlush(company));
+        }
+        log.info("Companies initialized");
+        return companies;
+    }
+
+    private List<MailTaskEntity> createInitialMailTasks(List<MailAddressEntity> addresses, int noOfTasksToCreate) {
+        List<MailTaskEntity> tasks = new ArrayList<>();
+        Random random = new Random();
+
+        for (MailAddressEntity address : addresses) {
+            for (int i = 0; i < noOfTasksToCreate; i++) {
+                MailTaskEntity task = MailTaskEntity.builder()
+                        .messageNumber(taskId)
+                        .orderNo(taskId)
+                        .content("Mail " + taskId + " text content")
+                        .from(address)
+                        .subject("Order no. " + taskId)
+                        .numberOfAttachments(random.nextInt(6))
+                        .build();
+                tasks.add(mailTaskRepository.saveAndFlush(task));
+                taskId++;
+            }
+        }
+        log.info(noOfTasksToCreate + " mail tasks initialized");
+        return tasks;
+    }
+
+    private HashMap<Integer, List<MailAddressEntity>> createInitialMailAddresses(List<CompanyEntity> companies, int numberOfAddresses) {
+        HashMap<Integer, List<MailAddressEntity>> mailAddresses = new HashMap<>();
+
+        for(int i = 0; i < companies.size(); i++) {
+            List<MailAddressEntity> compAddresses = new ArrayList<>();
+
+            for(int j = 0; j < numberOfAddresses; j++) {
+                MailAddressEntity address = MailAddressEntity.builder()
+                        .address(companies.get(i).getName().toLowerCase() + j + "@comp.com")
+                        .company(companies.get(i))
+                        .build();
+                compAddresses.add(mailAddressRepository.save(address));
+            }
+            mailAddresses.put(i, compAddresses);
+        }
+        return mailAddresses;
+    }
+
+    @Transactional
+    public UserEntity createBootstrapAdmin() {
+        return userService.save(UserEntity.builder()
+                .username("AUser")
                 .password(DEFAULT_PASSWORD)
                 .authorities(Collections.singletonList(roleService.find(Role.ADMIN)))
-                .build();
+                .build());
     }
 
-    private UserEntity createBootstrapUser() {
-        return UserEntity.builder()
-                .username("USurname")
-                .mail("user.surname@test.pl")
+    @Transactional
+    public UserEntity createBootstrapEmployee() {
+        return userService.save(UserEntity.builder()
+                .username("EUser")
                 .password(DEFAULT_PASSWORD)
-                .authorities(Collections.singletonList(roleService.find(Role.USER)))
-                .build();
+                .authorities(Collections.singletonList(roleService.find(Role.EMPLOYEE)))
+                .build());
     }
 
-    private MailTaskEntity createInitialMailTask(int messageNumber, int numberOfAttachments, MailAddressEntity mailAddress) {
-        MailTaskEntity task = MailTaskEntity.builder()
-                .messageNumber(messageNumber)
-                .content("Mail text content")
-                .from(mailAddress)
-                .subject("Order no. " + messageNumber)
-                .numberOfAttachments(numberOfAttachments)
-                .build();
-        mailTaskRepository.saveAndFlush(task);
-        return task;
-    }
-
-    private MailAddressEntity createInitialMailAddress(String companyName) {
-        MailAddressEntity address = MailAddressEntity.builder()
-                .address(Optional.ofNullable(companyName).map(name -> name + "@comp.com").orElse("random@gmail.com"))
-                .company(Optional.ofNullable(companyName).map(this::createInitialCompany).orElse(null))
-                .build();
-        mailAddressRepository.saveAndFlush(address);
-        return address;
-    }
-
-    private CompanyEntity createInitialCompany(String companyName) {
-        CompanyEntity company = CompanyEntity.builder()
-                .name(companyName + "POL")
-                .build();
-        companyRepository.saveAndFlush(company);
-        return company;
-    }
-
-    private MailTaskGroupEntity createInitialMailTaskGroup(int initialMessageNumber, int groupSize) {
-        Set<MailTaskEntity> tasks = new HashSet<>();
-        for (int i = initialMessageNumber; i < groupSize + initialMessageNumber; i++) {
-            tasks.add(createInitialMailTask(i, 0, createInitialMailAddress(null)));
-        }
-        MailTaskGroupEntity group = MailTaskGroupEntity.builder()
-                .name("Group 1")
-                .build();
-        mailTaskGroupRepository.saveAndFlush(group);
-        return group;
+    @Transactional
+    public UserEntity createBootstrapClient(String username) {
+        return userService.save(UserEntity.builder()
+                .username(username)
+                .password(DEFAULT_PASSWORD)
+                .authorities(Collections.singletonList(roleService.find(Role.CLIENT)))
+                .build());
     }
 }

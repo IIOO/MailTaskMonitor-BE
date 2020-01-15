@@ -19,7 +19,8 @@ public class MailTaskServiceTests extends TaskApplicationTests {
     @Test
     void canSaveMailTaskWithCorrectFrom() {
         MailTaskEntity task = MailTaskEntity.builder()
-                .messageNumber(50)
+                .messageNumber(50L)
+                .orderNo(1L)
                 .from(new MailAddressEntity("random@gmail.com"))
                 .subject("Test subject")
                 .content("Text content")
