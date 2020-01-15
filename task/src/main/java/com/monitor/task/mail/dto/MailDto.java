@@ -5,13 +5,13 @@ import lombok.Getter;
 
 @Getter
 public class MailDto {
-    public int id;
+    public Long uid;
     public String subject;
     public String from;
 
     @Builder
-    public MailDto(int id, String subject, String from) {
-        this.id = id;
+    public MailDto(Long uid, String subject, String from) {
+        this.uid = uid;
         this.subject = subject;
         this.from = from;
     }

@@ -46,19 +46,12 @@ public class Bootstrap implements InitializingBean {
         initializeRoles();
         List<UserEntity> users = initializeUsers();
 
-        List<CompanyEntity> companies = createInitialCompanies(users);
-
-        // addresses by company
-        HashMap<Integer, List<MailAddressEntity>> addresses = createInitialMailAddresses(companies, 2);
-
-        HashMap<Integer, List<MailTaskEntity>> tasksByCompany = new HashMap<>();
-        List<MailTaskEntity> compZeroTasks = createInitialMailTasks(addresses.get(0), 5);
-        List<MailTaskEntity> compOneTasks = createInitialMailTasks(addresses.get(1), 2);
-//        List<MailTaskEntity> compTwoTasks = createInitialMailTasks(addresses.get(2));
-        tasksByCompany.put(0, compZeroTasks);
-        tasksByCompany.put(1, compOneTasks);
-//        tasksByCompany.put(2, compTwoTasks);
-
+//        List<CompanyEntity> companies = createInitialCompanies(users);
+//        // addresses by company
+//        Map<Integer, List<MailAddressEntity>> companiesAddresses = createInitialMailAddresses(companies, 2);
+//
+//        List<MailTaskEntity> companyZeroTasks = createInitialMailTasksByAddressList(companiesAddresses.get(0), 5);
+//        List<MailTaskEntity> companyOneTasks = createInitialMailTasksByAddressList(companiesAddresses.get(1), 2);
     }
 
     private void initializeRoles() {
@@ -94,29 +87,7 @@ public class Bootstrap implements InitializingBean {
         return companies;
     }
 
-    private List<MailTaskEntity> createInitialMailTasks(List<MailAddressEntity> addresses, int noOfTasksToCreate) {
-        List<MailTaskEntity> tasks = new ArrayList<>();
-        Random random = new Random();
-
-        for (MailAddressEntity address : addresses) {
-            for (int i = 0; i < noOfTasksToCreate; i++) {
-                MailTaskEntity task = MailTaskEntity.builder()
-                        .messageNumber(taskId)
-                        .orderNo(taskId)
-                        .content("Mail " + taskId + " text content")
-                        .from(address)
-                        .subject("Order no. " + taskId)
-                        .numberOfAttachments(random.nextInt(6))
-                        .build();
-                tasks.add(mailTaskRepository.saveAndFlush(task));
-                taskId++;
-            }
-        }
-        log.info(noOfTasksToCreate + " mail tasks initialized");
-        return tasks;
-    }
-
-    private HashMap<Integer, List<MailAddressEntity>> createInitialMailAddresses(List<CompanyEntity> companies, int numberOfAddresses) {
+    private Map<Integer, List<MailAddressEntity>> createInitialMailAddresses(List<CompanyEntity> companies, int numberOfAddresses) {
         HashMap<Integer, List<MailAddressEntity>> mailAddresses = new HashMap<>();
 
         for(int i = 0; i < companies.size(); i++) {
@@ -132,6 +103,28 @@ public class Bootstrap implements InitializingBean {
             mailAddresses.put(i, compAddresses);
         }
         return mailAddresses;
+    }
+
+    private List<MailTaskEntity> createInitialMailTasksByAddressList(List<MailAddressEntity> addresses, int noOfTasksToCreate) {
+        List<MailTaskEntity> tasks = new ArrayList<>();
+        Random random = new Random();
+
+        for (MailAddressEntity address : addresses) {
+            for (int i = 0; i < noOfTasksToCreate; i++) {
+                MailTaskEntity task = MailTaskEntity.builder()
+                        .uid(taskId)
+                        .orderNo(taskId)
+                        .content("Mail " + taskId + " text content")
+                        .from(address)
+                        .subject("Order no. " + taskId)
+                        .numberOfAttachments(random.nextInt(6))
+                        .build();
+                tasks.add(mailTaskRepository.saveAndFlush(task));
+                taskId++;
+            }
+        }
+        log.info(noOfTasksToCreate + " mail tasks initialized");
+        return tasks;
     }
 
     @Transactional

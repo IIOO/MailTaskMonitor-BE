@@ -2,6 +2,7 @@ package com.monitor.task.mail;
 
 import com.monitor.task.business.dto.TaskDto;
 import com.monitor.task.mail.dto.MailDto;
+import com.monitor.task.mail.service.MailService;
 
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;
@@ -10,13 +11,16 @@ import javax.mail.internet.MimeMultipart;
 import java.io.IOException;
 
 public class MessageMapper {
+
     public static TaskDto mapMessageToTaskDto(Message message) {
         TaskDto task = null;
         try {
+            String subject = readSubject(message);
             task = TaskDto.builder()
-                    .id(Integer.toUnsignedLong(message.getMessageNumber()))
+                    .uid(MailService.getInbox().getUID(message))
+                    .orderNo(SubjectSearchUtil.findOrderNumber(subject))
                     .from(addressesToString(message))
-                    .subject(readSubject(message))
+                    .subject(subject)
                     .content(getTextFromMessage(message))
                     .numberOfAttachments(attachmentsCount(message))
                     .build();
@@ -30,7 +34,7 @@ public class MessageMapper {
         MailDto mail = null;
         try {
             mail = MailDto.builder()
-                    .id(message.getMessageNumber())
+                    .uid(MailService.getInbox().getUID(message))
                     .from(addressesToString(message))
                     .subject(readSubject(message))
                     .build();

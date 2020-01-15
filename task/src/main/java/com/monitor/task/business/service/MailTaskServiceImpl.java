@@ -1,5 +1,6 @@
 package com.monitor.task.business.service;
 
+import com.monitor.task.business.MailTaskMapper;
 import com.monitor.task.business.MailTaskStatus;
 import com.monitor.task.business.dto.TaskDto;
 import com.monitor.task.business.persistance.MailAddressEntity;
@@ -39,14 +40,7 @@ public class MailTaskServiceImpl implements MailTaskService {
     @Transactional
     public MailTaskEntity saveMappedMailTaskToDb(TaskDto dto) {
         MailAddressEntity mailAddress = mailAddressService.findOrCreate(dto.getFrom());
-        MailTaskEntity mailTask = MailTaskEntity.builder()
-                .messageNumber(dto.getId())
-                .from(mailAddress)
-                .subject(dto.getSubject())
-                .content(dto.getContent())
-                .numberOfAttachments(dto.getNumberOfAttachments())
-                .build();
-        return save(mailTask);
+        return save(MailTaskMapper.mapTaskDtoToMailTaskEntity(dto,  mailAddress));
     }
 
     @Override
@@ -78,14 +72,13 @@ public class MailTaskServiceImpl implements MailTaskService {
 
     @Override
     @Transactional
-    public MailTaskEntity assignTaskToUser(Integer taskNumber, String username) {
+    public MailTaskEntity assignTaskToUser(Long uid, String username) {
         UserEntity user = userService.findByUsername(username);
-        MailTaskEntity mailTask = getByMessageNumber(taskNumber);
+        MailTaskEntity mailTask = getByUid(uid);
+        // create history record
+        createMailTaskHistory(mailTask);
 
         mailTask.setUser(user);
-
-        // create history record of change
-        createMailTaskHistory(mailTask);
         return mailTaskRepository.save(mailTask);
     }
 
@@ -103,14 +96,14 @@ public class MailTaskServiceImpl implements MailTaskService {
 
     @Override
     @Transactional
-    public MailTaskEntity changeTaskStatus(Integer taskNumber, MailTaskStatus status) {
-        MailTaskEntity mailTask = getByMessageNumber(taskNumber);
+    public MailTaskEntity changeTaskStatus(Long uid, MailTaskStatus status) {
+        MailTaskEntity mailTask = getByUid(uid);
 
         if (!status.equals(mailTask.getStatus())) {
-            mailTask.setStatus(status);
-
-            // create history record of change
+            // create history record
             createMailTaskHistory(mailTask);
+
+            mailTask.setStatus(status);
             mailTask = mailTaskRepository.save(mailTask);
         } else {
             log.info("New status same as old, no changes.");
@@ -118,6 +111,10 @@ public class MailTaskServiceImpl implements MailTaskService {
         return mailTask;
     }
 
+    /**
+     * Create new entry in history table representing old values of MailTask
+     * @param task object before update
+     */
     private void createMailTaskHistory(MailTaskEntity task) {
         mailTaskHistoryRepository.save(MailTaskHistoryEntity.builder()
                 .task(task)
@@ -127,8 +124,8 @@ public class MailTaskServiceImpl implements MailTaskService {
                 .build());
     }
 
-    private MailTaskEntity getByMessageNumber(Integer messageNumber) {
-        return mailTaskRepository.findByMessageNumber(messageNumber)
-                .orElseThrow(() -> new NoResultException("No task with taskNumber: " + messageNumber + " found"));
+    private MailTaskEntity getByUid(Long uid) {
+        return mailTaskRepository.findByUid(uid)
+                .orElseThrow(() -> new NoResultException("No task with taskNumber: " + uid + " found"));
     }
 }

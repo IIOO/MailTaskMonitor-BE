@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface MailTaskRepository extends JpaRepository<MailTaskEntity, Integer> {
-    Optional<MailTaskEntity> findByMessageNumber(Integer integer);
+    Optional<MailTaskEntity> findByUid(Long uid);
     List<MailTaskEntity> findMailTaskEntitiesByFromAddress(String fromAddress);
     List<MailTaskEntity> findMailTaskEntitiesByGroup(MailTaskGroupEntity groupEntity);
     List<MailTaskEntity> findMailTaskEntitiesByUserId(Long userId);

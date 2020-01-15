@@ -13,6 +13,5 @@ import java.util.List;
 public class UserDto {
     private Long id;
     private String username;
-    private String mail;
     private List<GrantedAuthority> authorities;
 }

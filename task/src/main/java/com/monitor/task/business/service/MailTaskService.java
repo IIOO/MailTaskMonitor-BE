@@ -13,7 +13,7 @@ public interface MailTaskService {
     List<MailTaskEntity> findTasksByUserId(Long userId);
     List<MailTaskEntity> findAllUnassigned();
     List<MailTaskEntity> getAll();
-    MailTaskEntity assignTaskToUser(Integer taskNumber, String user);
-    MailTaskEntity changeTaskStatus(Integer taskNumber, MailTaskStatus status);
+    MailTaskEntity assignTaskToUser(Long uid, String user);
+    MailTaskEntity changeTaskStatus(Long uid, MailTaskStatus status);
     MailTaskEntity saveMappedMailTaskToDb(TaskDto dto);
 }

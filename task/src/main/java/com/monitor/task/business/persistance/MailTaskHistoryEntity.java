@@ -32,6 +32,7 @@ public class MailTaskHistoryEntity {
     @OneToOne
     private MailTaskGroupEntity group;
 
+    @Enumerated(EnumType.STRING)
     private MailTaskStatus status;
 
     @Builder

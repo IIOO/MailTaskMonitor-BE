@@ -51,17 +51,17 @@ public class TaskController {
 
     // post because partial data change
     @PostMapping("{taskNumber}/assign")
-    public ResponseEntity<TaskDto> assignToLogged(@PathVariable("taskNumber") final int taskNumber,
+    public ResponseEntity<TaskDto> assignToLogged(@PathVariable("taskNumber") final long taskUid,
                                                   @AuthenticationPrincipal Object principal) {
-        MailTaskEntity updated = mailTaskService.assignTaskToUser(taskNumber, ((UserDetails)principal).getUsername());
+        MailTaskEntity updated = mailTaskService.assignTaskToUser(taskUid, ((UserDetails)principal).getUsername());
         return ResponseEntity.ok(MailTaskMapper.mapMailTaskEntityToTaskDto(updated));
     }
 
     // post because partial data change
     @PostMapping("{taskNumber}/status")
-    public ResponseEntity<TaskDto> changeStatus(@PathVariable("taskNumber") final int taskNumber,
+    public ResponseEntity<TaskDto> changeStatus(@PathVariable("taskNumber") final long taskUid,
                                                 @RequestBody final ChangeStatusCommand command) {
-        MailTaskEntity updated = mailTaskService.changeTaskStatus(taskNumber, command.getStatus());
+        MailTaskEntity updated = mailTaskService.changeTaskStatus(taskUid, command.getStatus());
         return ResponseEntity.ok(MailTaskMapper.mapMailTaskEntityToTaskDto(updated));
     }
 }

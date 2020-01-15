@@ -9,8 +9,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public abstract class TaskBasicInfo {
-    public Long id;
-    public String subject;
-    public String from;
+    private Long uid;
+    private Long orderNo;
+    private String subject;
+    private String from;
     private MailTaskStatus status;
 }

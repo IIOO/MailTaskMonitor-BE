@@ -16,7 +16,7 @@ import javax.persistence.*;
 @NoArgsConstructor
 public class MailTaskEntity {
     @Id
-    private Long messageNumber;
+    private Long uid;
 
     private Long orderNo;
 
@@ -43,8 +43,8 @@ public class MailTaskEntity {
     private MailTaskGroupEntity group;
 
     @Builder
-    public MailTaskEntity(Long messageNumber, Long orderNo, String subject, MailAddressEntity from, String content, int numberOfAttachments) {
-        this.messageNumber = messageNumber;
+    public MailTaskEntity(Long uid, Long orderNo, String subject, MailAddressEntity from, String content, int numberOfAttachments) {
+        this.uid = uid;
         this.orderNo = orderNo;
         this.subject = subject;
         this.from = from;

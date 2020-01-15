@@ -4,7 +4,7 @@ import com.monitor.task.business.persistance.MailTaskEntity;
 import com.monitor.task.business.service.MailTaskService;
 import com.monitor.task.config.StoreConnectionProperties;
 import com.monitor.task.mail.MessageMapper;
-import com.monitor.task.mail.SearchTermBuilder;
+import com.monitor.task.mail.SubjectSearchUtil;
 import com.sun.mail.imap.IMAPFolder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,11 +15,7 @@ import javax.annotation.PreDestroy;
 import javax.mail.*;
 import javax.mail.event.MessageCountAdapter;
 import javax.mail.event.MessageCountEvent;
-import javax.mail.search.SearchTerm;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
-import java.util.Properties;
+import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -28,15 +24,17 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 @RequiredArgsConstructor
 public class MailService {
+    private static final String FOLDER_NAME = "INBOX";
+    private static IMAPFolder inbox;
+
     private final Message[] NO_MESSAGES = {};
     private final StoreConnectionProperties storeConnectionProperties;
     private final MailTaskService mailTaskService;
 
     private Store store;
-    private IMAPFolder inbox;
 
     public List<Message> getMailsWithMatchingSubject() {
-        return Arrays.asList(getMessages(SearchTermBuilder.getSubjectSearchTerm()));
+        return Arrays.asList(getMessages(SubjectSearchUtil.getSubjectSearchTerm()));
     }
 
     public List<Message> getMails() {
@@ -44,7 +42,7 @@ public class MailService {
     }
 
     public Message getMailByNumber(int messageNumber) {
-        Message[] messages = getMessages(SearchTermBuilder.getMsgNumberSearchTerm(messageNumber));
+        Message[] messages = getMessages(SubjectSearchUtil.getMsgNumberSearchTerm(messageNumber));
         for (Message message : messages) {
             if (message.getMessageNumber() == messageNumber) {
                 log.info("Email with " + messageNumber + " found");
@@ -54,7 +52,7 @@ public class MailService {
         return null;
     }
 
-    private Message[] getMessages(SearchTerm searchTerm) {
+    private Message[] getMessages(javax.mail.search.SearchTerm searchTerm) {
         try {
             if (Objects.nonNull(searchTerm)) {
                 return inbox.search(searchTerm);
@@ -79,7 +77,8 @@ public class MailService {
             this.store = session.getStore("imaps");
             store.connect(storeConnectionProperties.getHost(), 993, storeConnectionProperties.getUsername(), storeConnectionProperties.getPassword());
             log.info("Connected to mail server");
-            this.inbox = (IMAPFolder) store.getFolder("INBOX");
+            inbox = (IMAPFolder) store.getFolder(FOLDER_NAME);
+            log.info("UIDValidity for folder " + FOLDER_NAME + ": " + inbox.getUIDValidity());
             setMessageCountListener();
 
         } catch (MessagingException e) {
@@ -94,18 +93,6 @@ public class MailService {
         log.info("Disconnected form mail server");
     }
 
-    private Message[] sortMessages(Message[] messages) {
-        // Sort messages from recent to oldest
-        Arrays.sort( messages, (m1, m2 ) -> {
-            try {
-                return m2.getSentDate().compareTo( m1.getSentDate() );
-            } catch ( MessagingException e ) {
-                throw new RuntimeException( e );
-            }
-        });
-        return messages;
-    }
-
     private void setMessageCountListener() throws MessagingException{
         inbox.open(Folder.READ_WRITE);
         inbox.addMessageCountListener(new MessageCountAdapter() {
@@ -113,11 +100,11 @@ public class MailService {
                 public void messagesAdded(MessageCountEvent ev) {
                     log.info("RECEIVED MAIL (Before subject & from check)");
                     Arrays.stream(ev.getMessages())
-                            .filter(msg -> SearchTermBuilder.stringMatchSubjectPattern(MessageMapper.readSubject(msg)))
+                            .filter(msg -> SubjectSearchUtil.stringMatchSubjectPattern(MessageMapper.readSubject(msg)))
                             .map(MessageMapper::mapMessageToTaskDto)
                             .forEach(task -> {
                                 MailTaskEntity saved = mailTaskService.saveMappedMailTaskToDb(task);
-                                log.info("NEW MAIL SAVED TO DB: " + saved.getMessageNumber());
+                                log.info("NEW MAIL SAVED TO DB: " + saved.getUid());
                             });
             }
         });
@@ -140,5 +127,14 @@ public class MailService {
                 }
             }
         }).start();
+    }
+
+    public static IMAPFolder getInbox() {
+        if (inbox.isOpen()) {
+            return inbox;
+        } else {
+            log.error("Folder " + FOLDER_NAME + " is closed!");
+        }
+        return inbox;
     }
 }
