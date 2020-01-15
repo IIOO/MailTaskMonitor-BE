@@ -40,7 +40,7 @@ public class MailTaskServiceImpl implements MailTaskService {
     @Transactional
     public MailTaskEntity saveMappedMailTaskToDb(TaskDto dto) {
         MailAddressEntity mailAddress = mailAddressService.findOrCreate(dto.getFrom());
-        return save(MailTaskMapper.mapTaskDtoToMailTaskEntity(dto,  mailAddress));
+        return save(MailTaskMapper.mapTaskDtoToMailTaskEntity(dto, mailAddress));
     }
 
     @Override

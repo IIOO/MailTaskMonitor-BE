@@ -20,9 +20,6 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationFi
 @Configuration
 @RequiredArgsConstructor
 public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
-    private static final String ADMIN = "ADMIN";
-    private static final String USER = "USER";
-
     private final Gson gson;
 
     private final AuthTokenService tokenService;
