@@ -29,6 +29,7 @@ public class MailTaskMapper {
                 .status(entity.getStatus())
                 .numberOfAttachments(entity.getNumberOfAttachments())
                 .assignedUser(Optional.ofNullable(entity.getUser()).map(UserMapper::mapUserEntityToUserDto).orElse(null))
+                .receivedDate(entity.getReceivedDate())
                 .build();
     }
 
@@ -40,6 +41,7 @@ public class MailTaskMapper {
                 .subject(dto.getSubject())
                 .content(dto.getContent())
                 .numberOfAttachments(dto.getNumberOfAttachments())
+                .receivedDate(dto.getReceivedDate())
                 .build();
     }
 }

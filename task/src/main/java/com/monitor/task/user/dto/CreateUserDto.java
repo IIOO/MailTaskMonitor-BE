@@ -4,12 +4,14 @@ import com.monitor.task.user.Role;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 public class CreateUserDto {
-    private String name;
-    private String surname;
-    private String mail;
+    private String username;
     private String password;
     private Role role;
+    private String companyName;
+    private List<String> mailAddresses;
 }

@@ -8,7 +8,7 @@ import com.monitor.task.user.persistance.UserEntity;
 public class UserMapper {
     public static UserEntity mapCreateUserToUserEntity(CreateUserDto dto) {
         return UserEntity.builder()
-                .username(dto.getName())
+                .username(dto.getUsername())
                 .password(dto.getPassword())
                 .build();
     }

@@ -1,5 +1,6 @@
 package com.monitor.task.user.persistance;
 
+import com.monitor.task.user.Role;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
@@ -15,16 +16,17 @@ public class RoleEntity implements GrantedAuthority {
     Long id;
 
     @Column(name = "role", unique = true, nullable = false)
-    private String role;
+    @Enumerated(EnumType.STRING)
+    private Role role;
 
     @Override
     @Transient
     public String getAuthority() {
-        return this.role;
+        return this.role.toString();
     }
 
     @Builder
-    public RoleEntity(String role) {
+    public RoleEntity(Role role) {
         this.role = role;
     }
 }

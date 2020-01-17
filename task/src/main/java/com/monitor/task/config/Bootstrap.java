@@ -56,7 +56,7 @@ public class Bootstrap implements InitializingBean {
 
     private void initializeRoles() {
         for (Role name : Role.values()) {
-            RoleEntity roleEntity = RoleEntity.builder().role(name.toString()).build();
+            RoleEntity roleEntity = RoleEntity.builder().role(name).build();
             roleRepository.save(roleEntity);
         }
         roleRepository.flush();

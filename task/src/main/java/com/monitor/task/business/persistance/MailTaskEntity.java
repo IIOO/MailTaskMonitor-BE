@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "mail_task")
@@ -42,14 +43,26 @@ public class MailTaskEntity {
     @JoinColumn(name = "group_id")
     private MailTaskGroupEntity group;
 
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime creationDate;
+
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime receivedDate;
+
     @Builder
-    public MailTaskEntity(Long uid, Long orderNo, String subject, MailAddressEntity from, String content, int numberOfAttachments) {
+    public MailTaskEntity(Long uid, Long orderNo, String subject, MailAddressEntity from, String content, int numberOfAttachments, LocalDateTime receivedDate) {
         this.uid = uid;
         this.orderNo = orderNo;
         this.subject = subject;
         this.from = from;
         this.content = content;
         this.numberOfAttachments = numberOfAttachments;
+        this.receivedDate = receivedDate;
         status = MailTaskStatus.TO_DO;
+    }
+
+    @PrePersist
+    void onCreate() {
+        creationDate = LocalDateTime.now();
     }
 }

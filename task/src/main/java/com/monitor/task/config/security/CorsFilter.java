@@ -1,5 +1,6 @@
 package com.monitor.task.config.security;
 
+import com.monitor.task.common.AppConst;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -21,7 +22,7 @@ public class CorsFilter implements Filter {
         response.setHeader("Access-Control-Allow-Methods", "DELETE, GET, HEAD, OPTIONS, POST, PUT, UPDATE, PATCH");
         response.setHeader("Access-Control-Max-Age", "3600");
         response.setHeader("Access-Control-Allow-Headers",
-                "Origin, X-Requested-With, Content-Type, Accept, Extension, Authorization, authToken");
+                "Origin, X-Requested-With, Content-Type, Accept, Extension, Authorization, " + AppConst.AUTH_TOKEN_NAME);
 
         if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
             response.setStatus(HttpServletResponse.SC_OK);

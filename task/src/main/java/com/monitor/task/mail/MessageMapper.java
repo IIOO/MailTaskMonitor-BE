@@ -9,6 +9,7 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMultipart;
 import java.io.IOException;
+import java.time.ZoneId;
 
 public class MessageMapper {
 
@@ -23,6 +24,9 @@ public class MessageMapper {
                     .subject(subject)
                     .content(getTextFromMessage(message))
                     .numberOfAttachments(attachmentsCount(message))
+                    .receivedDate(message.getReceivedDate().toInstant()
+                            .atZone(ZoneId.systemDefault())
+                            .toLocalDateTime())
                     .build();
         } catch (MessagingException | IOException ex) {
             ex.printStackTrace();
