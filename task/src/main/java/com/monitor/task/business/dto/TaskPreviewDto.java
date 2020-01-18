@@ -1,16 +1,18 @@
 package com.monitor.task.business.dto;
 
-import com.monitor.task.business.MailTaskStatus;
-import lombok.*;
-
+import lombok.Builder;
+import lombok.Getter;
 
 @Getter
-@NoArgsConstructor
-@ToString
-public class TaskPreviewDto extends TaskBasicInfo {
+public class TaskPreviewDto {
+    private Long uid;
+    private String orderNo;
+    private String company;
 
     @Builder
-    public TaskPreviewDto(Long uid, Long orderNo, String subject, String from, MailTaskStatus status) {
-        super(uid, orderNo, subject, from, status);
+    public TaskPreviewDto(Long uid, String orderNo, String company) {
+        this.uid = uid;
+        this.orderNo = orderNo;
+        this.company = company;
     }
 }

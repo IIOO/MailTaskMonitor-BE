@@ -1,8 +1,8 @@
 package com.monitor.task.business.service;
 
 import com.monitor.task.business.MailTaskStatus;
-import com.monitor.task.business.dto.TaskDto;
 import com.monitor.task.business.persistance.MailTaskEntity;
+import com.monitor.task.mail.dto.MailDto;
 
 import java.util.List;
 
@@ -15,5 +15,5 @@ public interface MailTaskService {
     List<MailTaskEntity> getAll();
     MailTaskEntity assignTaskToUser(Long uid, String user);
     MailTaskEntity changeTaskStatus(Long uid, MailTaskStatus status);
-    MailTaskEntity saveMappedMailTaskToDb(TaskDto dto);
+    MailTaskEntity saveMappedMessage(MailDto dto);
 }

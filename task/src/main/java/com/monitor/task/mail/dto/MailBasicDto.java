@@ -1,17 +1,17 @@
-package com.monitor.task.business.dto;
+package com.monitor.task.mail.dto;
 
-import com.monitor.task.business.MailTaskStatus;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public abstract class TaskBasicInfo {
+public abstract class MailBasicDto {
     private Long uid;
-    private Long orderNo;
     private String subject;
     private String from;
-    private MailTaskStatus status;
+    private LocalDateTime receivedDate;
 }

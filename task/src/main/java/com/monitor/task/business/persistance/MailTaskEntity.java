@@ -19,12 +19,14 @@ public class MailTaskEntity {
     @Id
     private Long uid;
 
-    private Long orderNo;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "group_id", nullable = false)
+    private MailTaskGroupEntity group;
 
     private String subject;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "address_id")
+    @JoinColumn(name = "address_id", nullable = false)
     private MailAddressEntity from;
 
     @Column(columnDefinition = "TEXT")
@@ -33,15 +35,12 @@ public class MailTaskEntity {
     private int numberOfAttachments;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private MailTaskStatus status;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private UserEntity user;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "group_id")
-    private MailTaskGroupEntity group;
 
     @Column(nullable = false, updatable = false)
     private LocalDateTime creationDate;
@@ -50,9 +49,9 @@ public class MailTaskEntity {
     private LocalDateTime receivedDate;
 
     @Builder
-    public MailTaskEntity(Long uid, Long orderNo, String subject, MailAddressEntity from, String content, int numberOfAttachments, LocalDateTime receivedDate) {
+    public MailTaskEntity(Long uid, MailTaskGroupEntity group, String subject, MailAddressEntity from, String content, int numberOfAttachments, LocalDateTime receivedDate) {
         this.uid = uid;
-        this.orderNo = orderNo;
+        this.group = group;
         this.subject = subject;
         this.from = from;
         this.content = content;

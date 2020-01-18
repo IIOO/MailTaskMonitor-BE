@@ -1,13 +1,10 @@
 package com.monitor.task.business.service;
 
-import com.monitor.task.business.MailTaskMapper;
 import com.monitor.task.business.MailTaskStatus;
-import com.monitor.task.business.dto.TaskDto;
-import com.monitor.task.business.persistance.MailAddressEntity;
-import com.monitor.task.business.persistance.MailTaskEntity;
-import com.monitor.task.business.persistance.MailTaskHistoryEntity;
+import com.monitor.task.business.persistance.*;
 import com.monitor.task.business.repository.MailTaskHistoryRepository;
 import com.monitor.task.business.repository.MailTaskRepository;
+import com.monitor.task.mail.dto.MailDto;
 import com.monitor.task.user.persistance.UserEntity;
 import com.monitor.task.user.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.NoResultException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -31,6 +29,8 @@ public class MailTaskServiceImpl implements MailTaskService {
 
     private final UserService userService;
 
+    private final MailTaskGroupService groupService;
+
     @Override
     @Transactional
     public MailTaskEntity save(MailTaskEntity mailTask) {
@@ -38,9 +38,25 @@ public class MailTaskServiceImpl implements MailTaskService {
     }
 
     @Transactional
-    public MailTaskEntity saveMappedMailTaskToDb(TaskDto dto) {
-        MailAddressEntity mailAddress = mailAddressService.findOrCreate(dto.getFrom());
-        return save(MailTaskMapper.mapTaskDtoToMailTaskEntity(dto, mailAddress));
+    public MailTaskEntity saveMappedMessage(MailDto dto) {
+        // search for address (should be configured to detect incoming emails, during user/company creation)
+        Optional<MailAddressEntity> mailAddress = mailAddressService.findByAddress(dto.getFrom());
+
+        if (mailAddress.isPresent()) {
+            CompanyEntity company = mailAddress.map(MailAddressEntity::getCompany).orElse(null);
+            MailTaskGroupEntity group = groupService.findOrCreate(dto.getOrderNo(), company);
+            return save(MailTaskEntity.builder()
+                    .uid(dto.getUid())
+                    .group(group)
+                    .subject(dto.getSubject())
+                    .from(mailAddress.get())
+                    .content(dto.getContent())
+                    .numberOfAttachments(dto.getNumberOfAttachments())
+                    .receivedDate(dto.getReceivedDate())
+                    .build());
+        }
+        log.error("Mail address: " + dto.getFrom() + " not present DB. Add it to some company configuration");
+        return null;
     }
 
     @Override

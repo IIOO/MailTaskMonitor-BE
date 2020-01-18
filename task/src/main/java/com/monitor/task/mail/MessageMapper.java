@@ -1,6 +1,5 @@
 package com.monitor.task.mail;
 
-import com.monitor.task.business.dto.TaskDto;
 import com.monitor.task.mail.dto.MailDto;
 import com.monitor.task.mail.service.MailService;
 
@@ -13,15 +12,15 @@ import java.time.ZoneId;
 
 public class MessageMapper {
 
-    public static TaskDto mapMessageToTaskDto(Message message) {
-        TaskDto task = null;
+    public static MailDto mapMessageToMailDto(Message message) {
+        MailDto mail = null;
         try {
             String subject = readSubject(message);
-            task = TaskDto.builder()
+            mail = MailDto.builder()
                     .uid(MailService.getInbox().getUID(message))
                     .orderNo(SubjectSearchUtil.findOrderNumber(subject))
-                    .from(addressesToString(message))
                     .subject(subject)
+                    .from(addressesToString(message))
                     .content(getTextFromMessage(message))
                     .numberOfAttachments(attachmentsCount(message))
                     .receivedDate(message.getReceivedDate().toInstant()
@@ -31,22 +30,20 @@ public class MessageMapper {
         } catch (MessagingException | IOException ex) {
             ex.printStackTrace();
         }
-        return task;
-    }
-
-    static MailDto mapMessageToMailDto(Message message) {
-        MailDto mail = null;
-        try {
-            mail = MailDto.builder()
-                    .uid(MailService.getInbox().getUID(message))
-                    .from(addressesToString(message))
-                    .subject(readSubject(message))
-                    .build();
-        } catch (MessagingException ex) {
-            ex.printStackTrace();
-        }
         return mail;
     }
+//
+//    public static MailTaskEntity mapMailDtoToMailTaskEntity (MailDto dto) {
+//        return MailTaskEntity.builder()
+//                .uid(dto.getUid())
+//                .orderNo(dto.getOrderNo())
+//                .subject(dto.getSubject())
+//                .from(dto.getFrom())
+//                .content(dto.getContent())
+//                .numberOfAttachments(dto.getNumberOfAttachments())
+//                .receivedDate(dto.getReceivedDate())
+//                .build();
+//    }
 
     private static String addressesToString(Message message) throws MessagingException {
         Address[] froms = message.getFrom();

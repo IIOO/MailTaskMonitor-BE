@@ -32,12 +32,12 @@ public class SubjectSearchUtil {
         return SUBJECT_PATTERN.matcher(str).matches();
     }
 
-    public static Long findOrderNumber(String str) {
+    public static String findOrderNumber(String str) {
         Matcher matcher = SUBJECT_PATTERN.matcher(str);
         if (matcher.groupCount() == 4) {
             matcher.find();
             String group = matcher.group(POSITION_OF_ORDER_NO_GROUP);
-            return Long.parseLong(group);
+            return group;
         }
         return null;
     }

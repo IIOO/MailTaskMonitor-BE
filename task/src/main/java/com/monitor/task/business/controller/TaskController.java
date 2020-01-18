@@ -6,7 +6,7 @@ import com.monitor.task.business.dto.TaskDto;
 import com.monitor.task.business.dto.TaskPreviewDto;
 import com.monitor.task.business.persistance.MailTaskEntity;
 import com.monitor.task.business.service.MailTaskService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -17,20 +17,16 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/task")
+@RequiredArgsConstructor
 public class TaskController {
-    private MailTaskService mailTaskService;
-
-    @Autowired
-    public TaskController(MailTaskService mailTaskService) {
-        this.mailTaskService = mailTaskService;
-    }
+    private final MailTaskService mailTaskService;
 
     @GetMapping("/all")
     public ResponseEntity<List<TaskPreviewDto>> getAllTasks() {
         List<TaskPreviewDto> mapped = mailTaskService.getAll().stream()
                 .map(MailTaskMapper::mapMailTaskEntityToTaskPreviewDto)
                 .collect(Collectors.toList());
-        return ResponseEntity.ok().body(mapped);
+        return ResponseEntity.ok(mapped);
     }
 
     @GetMapping("/unassigned")

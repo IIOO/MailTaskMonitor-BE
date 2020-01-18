@@ -5,10 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Entity
 @Table(name = "mail_task_group")
@@ -20,10 +17,14 @@ public class MailTaskGroupEntity {
     @GeneratedValue
     private Long id;
 
-    private String name;
+    private String orderNo;
+
+    @ManyToOne
+    private CompanyEntity company;
 
     @Builder
-    public MailTaskGroupEntity(String name) {
-        this.name = name;
+    public MailTaskGroupEntity(String orderNo, CompanyEntity company) {
+        this.orderNo = orderNo;
+        this.company = company;
     }
 }

@@ -101,9 +101,9 @@ public class MailService {
                     log.info("RECEIVED MAIL (Before subject & from check)");
                     Arrays.stream(ev.getMessages())
                             .filter(msg -> SubjectSearchUtil.stringMatchSubjectPattern(MessageMapper.readSubject(msg)))
-                            .map(MessageMapper::mapMessageToTaskDto)
-                            .forEach(task -> {
-                                MailTaskEntity saved = mailTaskService.saveMappedMailTaskToDb(task);
+                            .map(MessageMapper::mapMessageToMailDto)
+                            .forEach(mail -> {
+                                MailTaskEntity saved = mailTaskService.saveMappedMessage(mail);
                                 log.info("NEW MAIL SAVED TO DB: " + saved.getUid());
                             });
             }

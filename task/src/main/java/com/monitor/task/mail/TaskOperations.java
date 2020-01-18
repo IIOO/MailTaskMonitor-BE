@@ -1,8 +1,9 @@
 package com.monitor.task.mail;
 
 import com.monitor.task.business.MailTaskMapper;
-import com.monitor.task.business.dto.TaskDto;
+import com.monitor.task.business.persistance.MailAddressEntity;
 import com.monitor.task.business.persistance.MailTaskEntity;
+import com.monitor.task.business.service.MailAddressService;
 import com.monitor.task.business.service.MailTaskService;
 import com.monitor.task.mail.dto.MailDto;
 import com.monitor.task.mail.service.AttachmentsDownloadService;
@@ -27,6 +28,8 @@ public class TaskOperations {
 
     private final AttachmentsDownloadService attachmentsDownloadService;
 
+    private final MailAddressService mailAddressService;
+
 
     /**
      * Get mails to display directly form mail server
@@ -43,9 +46,9 @@ public class TaskOperations {
      * @param messageNumber number which identify message on mail server
      * @return mapped mail message details to display
      */
-    public Optional<TaskDto> getMail(int messageNumber) {
+    public Optional<MailDto> getMail(int messageNumber) {
         Optional<Message> message = Optional.ofNullable(mailService.getMailByNumber(messageNumber));
-        return message.map(MessageMapper::mapMessageToTaskDto);
+        return message.map(MessageMapper::mapMessageToMailDto);
     }
 
     /**
@@ -59,19 +62,26 @@ public class TaskOperations {
         return attachmentsDownloadService.downloadAttachments(message);
     }
 
-    public List<TaskDto> fetchMailsToDb() {
+    public List<MailDto> fetchMailsToDb() {
         List<MailTaskEntity> saved = new ArrayList<>();
+        // get all addresses added to DB
+        List<String> allowedAddresses = mailAddressService.getAll().stream()
+                .map(MailAddressEntity::getAddress).collect(Collectors.toList());
 
-        List<TaskDto> taskDtos = mailService.getMailsWithMatchingSubject().stream()
-                .map(MessageMapper::mapMessageToTaskDto)
+        // get all mails with subject matching regex and within configured list of sender addresses, map them
+        List<MailDto> mailDtos = mailService.getMailsWithMatchingSubject().stream()
+                .map(MessageMapper::mapMessageToMailDto)
+                .filter(dto -> allowedAddresses.contains(dto.getFrom()))
                 .collect(Collectors.toList());
-        log.info(taskDtos.size() + " mails fetched, saving... ");
-        taskDtos.forEach(task -> {
-            saved.add(mailTaskService.saveMappedMailTaskToDb(task));
+
+        log.info(mailDtos.size() + " mails fetched, saving... ");
+        mailDtos.forEach(mail -> {
+            saved.add(mailTaskService.saveMappedMessage(mail));
         });
         log.info("Saved " + saved.size() + " tasks to DB.");
+
         return saved.stream()
-                .map(MailTaskMapper::mapMailTaskEntityToTaskDto)
+                .map(MailTaskMapper::mapMailTaskEntityToMailDto)
                 .collect(Collectors.toList());
     }
 }

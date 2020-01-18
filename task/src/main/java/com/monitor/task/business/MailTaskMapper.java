@@ -2,8 +2,9 @@ package com.monitor.task.business;
 
 import com.monitor.task.business.dto.TaskDto;
 import com.monitor.task.business.dto.TaskPreviewDto;
-import com.monitor.task.business.persistance.MailAddressEntity;
+import com.monitor.task.business.persistance.CompanyEntity;
 import com.monitor.task.business.persistance.MailTaskEntity;
+import com.monitor.task.mail.dto.MailDto;
 import com.monitor.task.user.UserMapper;
 
 import java.util.Optional;
@@ -12,17 +13,15 @@ public class MailTaskMapper {
     public static TaskPreviewDto mapMailTaskEntityToTaskPreviewDto(MailTaskEntity entity) {
         return TaskPreviewDto.builder()
                 .uid(entity.getUid())
-                .orderNo(entity.getOrderNo())
-                .from(entity.getFrom().getAddress())
-                .subject(entity.getSubject())
-                .status(entity.getStatus())
+                .company(Optional.ofNullable(entity.getFrom().getCompany()).map(CompanyEntity::getName).orElse(null))
+                .orderNo(entity.getGroup().getOrderNo())
                 .build();
     }
 
     public static TaskDto mapMailTaskEntityToTaskDto(MailTaskEntity entity) {
-        return TaskDto.builder()
+        return TaskDto.taskBuilder()
                 .uid(entity.getUid())
-                .orderNo(entity.getOrderNo())
+                .orderNo(entity.getGroup().getOrderNo())
                 .from(entity.getFrom().getAddress())
                 .subject(entity.getSubject())
                 .content(entity.getContent())
@@ -33,15 +32,15 @@ public class MailTaskMapper {
                 .build();
     }
 
-    public static MailTaskEntity mapTaskDtoToMailTaskEntity(TaskDto dto, MailAddressEntity address) {
-        return MailTaskEntity.builder()
-                .uid(dto.getUid())
-                .orderNo(dto.getOrderNo())
-                .from(address)
-                .subject(dto.getSubject())
-                .content(dto.getContent())
-                .numberOfAttachments(dto.getNumberOfAttachments())
-                .receivedDate(dto.getReceivedDate())
+    public static MailDto mapMailTaskEntityToMailDto(MailTaskEntity entity) {
+        return MailDto.builder()
+                .uid(entity.getUid())
+                .orderNo(entity.getGroup().getOrderNo())
+                .subject(entity.getSubject())
+                .from(entity.getFrom().getAddress())
+                .content(entity.getContent())
+                .numberOfAttachments(entity.getNumberOfAttachments())
+                .receivedDate(entity.getReceivedDate())
                 .build();
     }
 }

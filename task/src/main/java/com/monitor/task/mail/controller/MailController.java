@@ -1,6 +1,5 @@
 package com.monitor.task.mail.controller;
 
-import com.monitor.task.business.dto.TaskDto;
 import com.monitor.task.mail.TaskOperations;
 import com.monitor.task.mail.dto.MailDto;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +27,7 @@ public class MailController {
     }
 
     @GetMapping("/{messageNumber}")
-    public ResponseEntity<TaskDto> getTaskByNumber(@PathVariable("messageNumber") final int messageNumber) {
+    public ResponseEntity<MailDto> getTaskByNumber(@PathVariable("messageNumber") final int messageNumber) {
         return taskOperations.getMail(messageNumber).map(ResponseEntity::ok).orElse(ResponseEntity.noContent().build());
     }
 
@@ -38,7 +37,7 @@ public class MailController {
     }
 
     @GetMapping("/fetch")
-    public ResponseEntity<List<TaskDto>> fetchFromMailToDb() {
+    public ResponseEntity<List<MailDto>> fetchFromMailToDb() {
         return ResponseEntity.ok(taskOperations.fetchMailsToDb());
     }
 }

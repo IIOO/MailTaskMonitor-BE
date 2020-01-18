@@ -5,7 +5,6 @@ import com.monitor.task.business.persistance.MailAddressEntity;
 import com.monitor.task.business.persistance.MailTaskEntity;
 import com.monitor.task.business.repository.CompanyRepository;
 import com.monitor.task.business.repository.MailAddressRepository;
-import com.monitor.task.business.repository.MailTaskGroupRepository;
 import com.monitor.task.business.repository.MailTaskRepository;
 import com.monitor.task.user.Role;
 import com.monitor.task.user.persistance.RoleEntity;
@@ -37,7 +36,6 @@ public class Bootstrap implements InitializingBean {
     private final CompanyRepository companyRepository;
     private final MailAddressRepository mailAddressRepository;
     private final MailTaskRepository mailTaskRepository;
-    private final MailTaskGroupRepository mailTaskGroupRepository;
 
 
     @Override
@@ -113,7 +111,7 @@ public class Bootstrap implements InitializingBean {
             for (int i = 0; i < noOfTasksToCreate; i++) {
                 MailTaskEntity task = MailTaskEntity.builder()
                         .uid(taskId)
-                        .orderNo(taskId)
+//                        .group()
                         .content("Mail " + taskId + " text content")
                         .from(address)
                         .subject("Order no. " + taskId)
