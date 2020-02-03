@@ -62,6 +62,12 @@ public class TaskOperations {
         return attachmentsDownloadService.downloadAttachments(message);
     }
 
+    /**
+     * Fetch mails from mail server to database using filters:
+     * subject has to match pattern
+     * sender address has to be saved in database (company could have many configured addresses)
+     * @return mapped messages saved in database
+     */
     public List<MailDto> fetchMailsToDb() {
         List<MailTaskEntity> saved = new ArrayList<>();
         // get all addresses added to DB

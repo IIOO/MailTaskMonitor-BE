@@ -2,7 +2,7 @@ package com.monitor.task.mail.controller;
 
 import com.monitor.task.mail.TaskOperations;
 import com.monitor.task.mail.dto.MailDto;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -13,13 +13,9 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/mail")
+@RequiredArgsConstructor
 public class MailController {
-    private TaskOperations taskOperations;
-
-    @Autowired
-    public MailController(TaskOperations taskOperations) {
-        this.taskOperations = taskOperations;
-    }
+    private final TaskOperations taskOperations;
 
     @GetMapping
     public ResponseEntity<List<MailDto>> getAllTasks() {

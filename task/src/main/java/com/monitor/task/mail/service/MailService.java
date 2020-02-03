@@ -15,7 +15,11 @@ import javax.annotation.PreDestroy;
 import javax.mail.*;
 import javax.mail.event.MessageCountAdapter;
 import javax.mail.event.MessageCountEvent;
-import java.util.*;
+import javax.mail.search.SearchTerm;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
+import java.util.Properties;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -33,10 +37,17 @@ public class MailService {
 
     private Store store;
 
+    /**
+     * @return all messages matching subject pattern
+     */
     public List<Message> getMailsWithMatchingSubject() {
         return Arrays.asList(getMessages(SubjectSearchUtil.getSubjectSearchTerm()));
     }
 
+    /**
+     * Get all messages without any search conditions
+     * @return list of messages
+     */
     public List<Message> getMails() {
         return Arrays.asList(getMessages(null));
     }
@@ -52,7 +63,7 @@ public class MailService {
         return null;
     }
 
-    private Message[] getMessages(javax.mail.search.SearchTerm searchTerm) {
+    private Message[] getMessages(SearchTerm searchTerm) {
         try {
             if (Objects.nonNull(searchTerm)) {
                 return inbox.search(searchTerm);
@@ -66,6 +77,9 @@ public class MailService {
         return NO_MESSAGES;
     }
 
+    /**
+     * Make connection to mail server after dependency injection is done
+     */
     @PostConstruct
     private void connect() {
         Properties props = new Properties();
@@ -93,6 +107,10 @@ public class MailService {
         log.info("Disconnected form mail server");
     }
 
+    /**
+     * Listen for incoming mail messages and save them in database if they match subject pattern
+     * @throws MessagingException
+     */
     private void setMessageCountListener() throws MessagingException{
         inbox.open(Folder.READ_WRITE);
         inbox.addMessageCountListener(new MessageCountAdapter() {
@@ -129,6 +147,10 @@ public class MailService {
         }).start();
     }
 
+    /**
+     * Get default mail server folder used by application (message UID depends on folder so application always use same for simplicity)
+     * @return folder
+     */
     public static IMAPFolder getInbox() {
         if (inbox.isOpen()) {
             return inbox;

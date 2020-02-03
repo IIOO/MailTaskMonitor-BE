@@ -37,6 +37,9 @@ public class Bootstrap implements InitializingBean {
     private final MailAddressRepository mailAddressRepository;
     private final MailTaskRepository mailTaskRepository;
 
+    // for testing/demo purpose
+    private final StoreConnectionProperties storeConnectionProperties;
+
 
     @Override
     public void afterPropertiesSet() {
@@ -44,10 +47,11 @@ public class Bootstrap implements InitializingBean {
         initializeRoles();
         List<UserEntity> users = initializeUsers();
 
-//        List<CompanyEntity> companies = createInitialCompanies(users);
+        List<CompanyEntity> companies = createInitialCompanies(users);
 //        // addresses by company
-//        Map<Integer, List<MailAddressEntity>> companiesAddresses = createInitialMailAddresses(companies, 2);
-//
+        Map<Integer, List<MailAddressEntity>> companiesAddresses = createInitialMailAddresses(companies, 2);
+
+        createMailAddressMatchingFilter(companies.get(0));
 //        List<MailTaskEntity> companyZeroTasks = createInitialMailTasksByAddressList(companiesAddresses.get(0), 5);
 //        List<MailTaskEntity> companyOneTasks = createInitialMailTasksByAddressList(companiesAddresses.get(1), 2);
     }
@@ -58,6 +62,20 @@ public class Bootstrap implements InitializingBean {
             roleRepository.save(roleEntity);
         }
         roleRepository.flush();
+    }
+
+    /**
+     * This configuration assign address specified in storeConnection.properties to sample company
+     * it allows you sending test emails from this address to itself (containing subject matching regex specified in SubjectSearchUtil)
+     * @param company sample company
+     */
+    private void createMailAddressMatchingFilter(CompanyEntity company) {
+        log.info("Create mail address matching connection configuration");
+        MailAddressEntity address = MailAddressEntity.builder()
+                .address(storeConnectionProperties.getUsername())
+                .company(company)
+                .build();
+        mailAddressRepository.save(address);
     }
 
     private List<UserEntity> initializeUsers() {
